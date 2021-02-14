@@ -169,7 +169,7 @@ export default class Posts extends React.Component<{}, S> {
                     {this.renderAttachments(post as PostWithAttachment)}
                     {this.renderData(post)}
                 </div>
-                <div className="_3-94 _2lem">{moment(post.timestamp).format('MMMM Do, YYYY, H:mm')}</div>
+                <div className="_3-94 _2lem">{moment(post.timestamp*1000).format('MMM Do, YYYY, h:mm A')}</div>
             </div>
         );
     }
