@@ -15,7 +15,8 @@ export interface MediaAttachmentData {
         title: string,
         description: string,
         uri: string,
-        content: string
+        content: string,
+        webViewLink: string
     };
 }
 

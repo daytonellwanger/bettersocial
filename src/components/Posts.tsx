@@ -4,19 +4,24 @@ import './Posts.css';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../Posts';
 import driveClient from '../DriveClient';
 
-async function downloadPhoto(uri: string): Promise<string> {
+async function getPhotoData(uri: string): Promise<{ content: string, webViewLink: string } | undefined> {
     const uriPieces = uri.split('/');
     const fileName = uriPieces[uriPieces.length - 1];
     const photoFile = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
     if (!(photoFile && photoFile.length === 1)) {
-        return '';
+        return;
     }
     const photoFileId = photoFile[0].id!;
     if (!photoFileId) {
-        return '';
+        return;
     }
-    const photo = await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' });
-    return photo.body;
+    // TODO: run these in parallel
+    const photoContent = (await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' })).body;
+    const photoInfo = (await gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink' })).result;
+    return {
+        content: photoContent,
+        webViewLink: photoInfo.webViewLink!
+    };
 }
 
 interface S {
@@ -138,9 +143,12 @@ export default class Posts extends React.Component<{}, S> {
 
     renderMediaAttachmentData(data: MediaAttachmentData) {
         if (!data.media.content) {
-            downloadPhoto(data.media.uri).then((content: string) => {
-                data.media.content = content;
-                this.setState({ ...this.state });
+            getPhotoData(data.media.uri).then((photoData) => {
+                if (photoData) {
+                    data.media.content = photoData.content;
+                    data.media.webViewLink = photoData.webViewLink;
+                    this.setState({ ...this.state });
+                }
             });
         }
         return (
@@ -152,7 +160,7 @@ export default class Posts extends React.Component<{}, S> {
                                 <tr className="_51mx">
                                     <td className="_51m- pas">
                                         <div>
-                                            <a href="index.html">
+                                            <a href={data.media.webViewLink}>
                                                 <img src={`data:image/jpeg;base64,${btoa(data.media.content)}`} className="_2yuc _3-96" />
                                             </a>
                                             <div className="_3-95">{data.media.description}</div>
