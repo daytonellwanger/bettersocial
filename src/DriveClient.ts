@@ -48,7 +48,7 @@ class DriveClient {
         }
         const postsFolderId = postsFolder.id;
 
-        const postsFile = (await gapi.client.drive.files.list({ q: `"${postsFolderId}" in parents` })).result.files!;
+        const postsFile = (await gapi.client.drive.files.list({ q: `"${postsFolderId}" in parents and name contains 'your_posts'` })).result.files!;
         if (!postsFile || postsFile.length === 0) {
             throw new Error('Posts folder has no children');
         }

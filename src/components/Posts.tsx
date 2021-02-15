@@ -1,32 +1,17 @@
 import React from 'react';
 import moment from 'moment';
-import './Posts.css';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../Posts';
 import driveClient from '../DriveClient';
+import Image from './Image';
+import './Posts.css';
 
-async function getPhotoData(uri: string): Promise<{ content: string, webViewLink: string } | undefined> {
-    const uriPieces = uri.split('/');
-    const fileName = uriPieces[uriPieces.length - 1];
-    const photoFile = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
-    if (!(photoFile && photoFile.length === 1)) {
-        return;
-    }
-    const photoFileId = photoFile[0].id!;
-    if (!photoFileId) {
-        return;
-    }
-    // TODO: run these in parallel
-    const photoContent = (await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' })).body;
-    const photoInfo = (await gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink' })).result;
-    return {
-        content: photoContent,
-        webViewLink: photoInfo.webViewLink!
-    };
-}
+const pageSize = 25;
 
 interface S {
     loading: boolean,
     posts: (Post | PostWithAttachment)[],
+    loadedPosts: (Post | PostWithAttachment)[],
     error?: string
 }
 
@@ -34,13 +19,15 @@ export default class Posts extends React.Component<{}, S> {
 
     state: S = {
         loading: true,
-        posts: []
+        posts: [],
+        loadedPosts: []
     };
 
     async componentDidMount() {
         try {
             const posts = (await driveClient.getPosts())!;
-            this.setState({ loading: false, posts });
+            const loadedPosts = posts.slice(0, Math.min(pageSize, posts.length));
+            this.setState({ loading: false, posts, loadedPosts });
         } catch (e) {
             this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
         }
@@ -61,7 +48,7 @@ export default class Posts extends React.Component<{}, S> {
 
     renderPost(post: Post | PostWithAttachment) {
         return (
-            <div className="pam _3-95 _2pi0 _2lej uiBoxWhite noborder" key={post.timestamp}>
+            <div className="pam _3-95 _2pi0 _2lej uiBoxWhite noborder">
                 {
                     post.title
                         ? <div className="_3-96 _2pio _2lek _2lel">{post.title}</div>
@@ -109,7 +96,7 @@ export default class Posts extends React.Component<{}, S> {
     }
 
     renderAttachments(post: PostWithAttachment) {
-        if (post.attachments) {
+        if (post.attachments && post.attachments.length > 0) {
             const attachment = post.attachments[0];
             const attachmentData = attachment.data[0];
             if ((attachmentData as ExternalContextAttachmentData).external_context) {
@@ -142,15 +129,6 @@ export default class Posts extends React.Component<{}, S> {
     }
 
     renderMediaAttachmentData(data: MediaAttachmentData) {
-        if (!data.media.content) {
-            getPhotoData(data.media.uri).then((photoData) => {
-                if (photoData) {
-                    data.media.content = photoData.content;
-                    data.media.webViewLink = photoData.webViewLink;
-                    this.setState({ ...this.state });
-                }
-            });
-        }
         return (
             <div className="_2pin">
                 <div>
@@ -160,9 +138,7 @@ export default class Posts extends React.Component<{}, S> {
                                 <tr className="_51mx">
                                     <td className="_51m- pas">
                                         <div>
-                                            <a href={data.media.webViewLink}>
-                                                <img src={`data:image/jpeg;base64,${btoa(data.media.content)}`} className="_2yuc _3-96" />
-                                            </a>
+                                            <Image data={data} />
                                             <div className="_3-95">{data.media.description}</div>
                                         </div>
                                     </td>
@@ -182,7 +158,28 @@ export default class Posts extends React.Component<{}, S> {
         if (this.state.error) {
             return <p>{this.state.error}</p>
         }
-        return this.state.posts.map(p => this.renderPost(p));
+        return (
+            <InfiniteScroll
+                dataLength={this.state.loadedPosts.length}
+                next={() => {
+                    const loadedPosts = this.state.loadedPosts.concat(
+                        this.state.posts.slice(
+                            this.state.loadedPosts.length,
+                            Math.min(this.state.loadedPosts.length + pageSize, this.state.posts.length)
+                        )
+                    );
+                    this.setState({ ...this.state, loadedPosts });
+                }}
+                hasMore={this.state.posts.length > this.state.loadedPosts.length}
+                loader={<p>Loading...</p>}
+            >
+                {this.state.loadedPosts.map((p, idx) => (
+                    <div key={idx}>
+                        {this.renderPost(p)}
+                    </div>
+                ))}
+            </InfiniteScroll>
+        );
     }
 
     render() {
