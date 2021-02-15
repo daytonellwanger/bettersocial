@@ -3,8 +3,13 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import TopBar from './TopBar';
 import Home from './Home';
 import Posts from './Posts';
+import driveClient from '../DriveClient';
 
 export default class Router extends React.Component {
+
+    componentDidMount() {
+        driveClient.init();
+    }
 
     render() {
         return (

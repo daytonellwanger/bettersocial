@@ -1,116 +1,29 @@
 import React from 'react';
 import moment from 'moment';
 import './Posts.css';
-
-interface PostData {
-    post: string;
-}
-
-type Data = PostData | any;
-
-interface ExternalContextAttachmentData {
-    external_context: {
-        url: string
-    };
-}
-
-interface MediaAttachmentData {
-    media: {
-        title: string,
-        description: string,
-        uri: string,
-        content: string
-    };
-}
-
-type AttachmentData = ExternalContextAttachmentData | MediaAttachmentData;
-
-interface Post {
-    timestamp: number;
-    title?: string;
-    data?: Data[];
-    tags?: string[]
-}
-
-interface PostWithAttachment extends Post {
-    attachments: {
-        data: AttachmentData[]
-    }[];
-}
+import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../Posts';
+import driveClient from '../DriveClient';
 
 interface S {
-    posts: (Post | PostWithAttachment)[]
+    loading: boolean,
+    posts: (Post | PostWithAttachment)[],
+    error?: string
 }
 
 export default class Posts extends React.Component<{}, S> {
 
     state: S = {
+        loading: true,
         posts: []
     };
 
-    private async getPosts() {
-        const mainFolder = (await gapi.client.drive.files.list({ q: "mimeType = 'application/vnd.google-apps.folder' and name = 'facebookdata'" })).result.files!;
-        if (!(mainFolder && mainFolder.length === 1)) {
-            return;
+    async componentDidMount() {
+        try {
+            const posts = (await driveClient.getPosts())!;
+            this.setState({ loading: false, posts });
+        } catch (e) {
+            this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
         }
-        const mainFolderId = mainFolder[0].id;
-
-        const topicFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${mainFolderId}" in parents` })).result.files!;
-        if (!topicFolders) {
-            return;
-        }
-
-        const postsFolder = topicFolders.find(f => f.name === 'posts');
-        if (!(postsFolder && postsFolder.id)) {
-            return;
-        }
-        const postsFolderId = postsFolder.id;
-        const postsFile = (await gapi.client.drive.files.list({ q: `"${postsFolderId}" in parents` })).result.files!;
-        if (!(postsFile && postsFile.length === 1)) {
-            return;
-        }
-        const postsFileId = postsFile[0].id!;
-        if (!postsFileId) {
-            return;
-        }
-        const posts = (await gapi.client.drive.files.get({ fileId: postsFileId, alt: 'media' })).result as PostWithAttachment[];
-
-        // TODO download photos in parallel
-        // TODO return posts immediately and do photo download in background
-        for (let p of posts) {
-            const pwa = p as PostWithAttachment;
-            if (pwa.attachments) {
-                for (let a of pwa.attachments) {
-                    for (let d of a.data) {
-                        let mad = d as MediaAttachmentData;
-                        if (mad.media && mad.media.uri) {
-                            mad.media.content = await this.downloadPhoto(mad.media.uri);
-                        }
-                    }
-                }
-            }
-        }
-
-        this.setState({ ...this.state, posts });
-    }
-
-    private async downloadPhoto(uri: string): Promise<string> {
-        const uriPieces = uri.split('/');
-        const fileName = uriPieces[uriPieces.length - 1];
-        const photoFile = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
-        if (!(photoFile && photoFile.length === 1)) {
-            return '';
-        }
-        const photoFileId = photoFile[0].id!;
-        if (!photoFileId) {
-            return '';
-        }
-        const photo = await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' });
-        return photo.body;
-    }
-
-    componentDidMount() {
-        this.getPosts();
     }
 
     renderPostsTopBar() {
@@ -128,7 +41,7 @@ export default class Posts extends React.Component<{}, S> {
 
     renderPost(post: Post | PostWithAttachment) {
         return (
-            <div className="pam _3-95 _2pi0 _2lej uiBoxWhite noborder">
+            <div className="pam _3-95 _2pi0 _2lej uiBoxWhite noborder" key={post.timestamp}>
                 {
                     post.title
                         ? <div className="_3-96 _2pio _2lek _2lel">{post.title}</div>
@@ -233,11 +146,21 @@ export default class Posts extends React.Component<{}, S> {
         );
     }
 
+    renderBody() {
+        if (this.state.loading) {
+            return <p>Loading...</p>
+        }
+        if (this.state.error) {
+            return <p>{this.state.error}</p>
+        }
+        return this.state.posts.map(p => this.renderPost(p));
+    }
+
     render() {
         return (
             <div>
                 {this.renderPostsTopBar()}
-                {this.state.posts.map(p => this.renderPost(p))}
+                {this.renderBody()}
             </div>
         );
     }
