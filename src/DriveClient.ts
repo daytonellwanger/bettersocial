@@ -60,44 +60,9 @@ class DriveClient {
             throw new Error('Posts file has no ID');
         }
         const posts = (await gapi.client.drive.files.get({ fileId: postsFileId, alt: 'media' })).result as PostWithAttachment[];
-
-        await downloadPostPhotos(posts);
         return posts;
     }
 
-}
-
-async function downloadPostPhotos(posts: PostWithAttachment[]) {
-    // TODO download photos in parallel
-    // TODO return posts immediately and do photo download in background
-    for (let p of posts) {
-        const pwa = p as PostWithAttachment;
-        if (pwa.attachments) {
-            for (let a of pwa.attachments) {
-                for (let d of a.data) {
-                    let mad = d as MediaAttachmentData;
-                    if (mad.media && mad.media.uri) {
-                        mad.media.content = await downloadPhoto(mad.media.uri);
-                    }
-                }
-            }
-        }
-    }
-}
-
-async function downloadPhoto(uri: string): Promise<string> {
-    const uriPieces = uri.split('/');
-    const fileName = uriPieces[uriPieces.length - 1];
-    const photoFile = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
-    if (!(photoFile && photoFile.length === 1)) {
-        return '';
-    }
-    const photoFileId = photoFile[0].id!;
-    if (!photoFileId) {
-        return '';
-    }
-    const photo = await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' });
-    return photo.body;
 }
 
 const driveClient = new DriveClient();

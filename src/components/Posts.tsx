@@ -4,6 +4,21 @@ import './Posts.css';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../Posts';
 import driveClient from '../DriveClient';
 
+async function downloadPhoto(uri: string): Promise<string> {
+    const uriPieces = uri.split('/');
+    const fileName = uriPieces[uriPieces.length - 1];
+    const photoFile = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
+    if (!(photoFile && photoFile.length === 1)) {
+        return '';
+    }
+    const photoFileId = photoFile[0].id!;
+    if (!photoFileId) {
+        return '';
+    }
+    const photo = await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' });
+    return photo.body;
+}
+
 interface S {
     loading: boolean,
     posts: (Post | PostWithAttachment)[],
@@ -122,6 +137,12 @@ export default class Posts extends React.Component<{}, S> {
     }
 
     renderMediaAttachmentData(data: MediaAttachmentData) {
+        if (!data.media.content) {
+            downloadPhoto(data.media.uri).then((content: string) => {
+                data.media.content = content;
+                this.setState({ ...this.state });
+            });
+        }
         return (
             <div className="_2pin">
                 <div>
