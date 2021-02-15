@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './TopBar.css';
 
 export default class TopBar extends React.Component {
@@ -22,7 +23,7 @@ export default class TopBar extends React.Component {
                                 <div aria-label="Facebook" className="_2t-f" role="navigation">
                                     <div className="_cy6" id="bluebar_profile_and_home">
                                         <div className="_4kny _2s24">
-                                            <a className="_2s25 _cy7" href="/" title="Home">Home</a>
+                                            <Link className="_2s25 _cy7" to="/" title="Home">Home</Link>
                                         </div>
                                     </div>
                                 </div>

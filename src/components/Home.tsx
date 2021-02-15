@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Home.css';
 
 export default class Home extends React.Component {
@@ -25,8 +26,9 @@ export default class Home extends React.Component {
                         <table className="uiGrid _51mz _5f0n" cellSpacing="0" cellPadding="0">
                             <tbody>
                                 <tr className="_51mx">
-                                    <td className="_51m- vTop pbs _51mw"><a href="/posts"
-                                        className="_4rtt">Your Posts</a></td>
+                                    <td className="_51m- vTop pbs _51mw">
+                                        <Link to="/posts" className="_4rtt">Your Posts</Link>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

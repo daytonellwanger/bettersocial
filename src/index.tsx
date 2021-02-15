@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Router from './components/Router';
+import Main from './components/Main';
 
 ReactDOM.render(
     <React.StrictMode>
-        <Router />
+        <Main />
     </React.StrictMode>,
     document.getElementById('root')
 );
