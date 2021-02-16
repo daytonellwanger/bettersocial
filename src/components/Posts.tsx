@@ -79,7 +79,7 @@ export default class Posts extends React.Component<{}, S> {
         return (
             <div>
                 <div className="_2pin">
-                    <div>{data.post}</div>
+                    <div>{decodeString(data.post)}</div>
                 </div>
             </div>
         );
@@ -207,4 +207,12 @@ export default class Posts extends React.Component<{}, S> {
         );
     }
 
+}
+
+function decodeString(raw: string) {
+    const arr = [];
+    for (var i = 0; i < raw.length; i++) {
+        arr.push(raw.charCodeAt(i));
+    }
+    return Buffer.from(arr).toString('utf8');
 }
