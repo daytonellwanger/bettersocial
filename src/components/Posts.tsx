@@ -86,11 +86,18 @@ export default class Posts extends React.Component<{}, S> {
 
     renderTags(post: Post) {
         if (post.tags && post.tags.length > 0) {
+            let people = '';
+            if (post.tags.length === 1) {
+                people = post.tags[0];
+            } else {
+                people = post.tags.slice(0, post.tags.length - 1).join(', ');
+                people = `${people} and ${post.tags[post.tags.length - 1]}`;
+            }
             return (
                 <div>
-                    <div className="_u14">You tagged {post.tags[0]}</div>
+                    <div className="_u14">You tagged {people}</div>
                 </div>
-            )
+            );
         }
         return undefined;
     }
