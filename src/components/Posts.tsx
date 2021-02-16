@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import PulseLoader from 'react-spinners/PulseLoader';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../Posts';
 import driveClient from '../DriveClient';
 import Image from './Image';
@@ -160,7 +161,11 @@ export default class Posts extends React.Component<{}, S> {
 
     renderBody() {
         if (this.state.loading) {
-            return <p>Loading...</p>
+            return (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
+                    <PulseLoader color="#7086ff" size={10} />
+                </div>
+            );
         }
         if (this.state.error) {
             return <p>{this.state.error}</p>
@@ -178,7 +183,11 @@ export default class Posts extends React.Component<{}, S> {
                     this.setState({ ...this.state, loadedPosts });
                 }}
                 hasMore={this.state.posts.length > this.state.loadedPosts.length}
-                loader={<p>Loading...</p>}
+                loader={
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
+                        <PulseLoader color="#7086ff" size={10} />
+                    </div>
+                }
             >
                 {this.state.loadedPosts.map((p, idx) => (
                     <div key={idx}>
