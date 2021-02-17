@@ -2,7 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './TopBar.css';
 
-export default class TopBar extends React.Component {
+interface P {
+    signOut: () => void;
+}
+
+export default class TopBar extends React.Component<P> {
 
     render() {
         return (
@@ -24,6 +28,7 @@ export default class TopBar extends React.Component {
                                     <div className="_cy6" id="bluebar_profile_and_home">
                                         <div className="_4kny _2s24">
                                             <Link className="_2s25 _cy7" to="/" title="Home">Home</Link>
+                                            <a className="_2s25 _cy7" onClick={this.props.signOut}>Log Out</a>
                                         </div>
                                     </div>
                                 </div>

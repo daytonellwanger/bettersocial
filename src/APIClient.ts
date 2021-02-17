@@ -1,6 +1,6 @@
 export default class APIClient {
 
-    constructor (private isReadyCallback: () => void) {}
+    constructor (private updateSignInStatus: (isSignedIn: boolean) => void) {}
 
     public init() {
         gapi.load('client:auth2', () => this.initClient());
@@ -13,18 +13,16 @@ export default class APIClient {
             clientId: '1061292514174-dakput8vml1a9lk1o0qffgrg8mhtsvci.apps.googleusercontent.com',
             scope: 'https://www.googleapis.com/auth/drive.readonly'
         });
-        gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn: boolean) => this.updateSigninStatus(isSignedIn));
-        this.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-    }
-    
-    private async updateSigninStatus(isSignedIn: boolean) {
-        if (isSignedIn) {
-            this.isReadyCallback();
-        }
+        gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateSignInStatus);
+        this.updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
     }
     
     public signIn() {
         gapi.auth2.getAuthInstance().signIn();
+    }
+
+    public signOut() {
+        gapi.auth2.getAuthInstance().signOut();
     }
 
 }

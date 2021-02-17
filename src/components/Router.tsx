@@ -5,7 +5,11 @@ import Home from './Home';
 import Posts from './Posts';
 import driveClient from '../DriveClient';
 
-export default class Router extends React.Component {
+interface P {
+    signOut: () => void;
+}
+
+export default class Router extends React.Component<P> {
 
     componentDidMount() {
         driveClient.init();
@@ -17,7 +21,7 @@ export default class Router extends React.Component {
                 <div className="clearfix _ikh">
                     <div className="_4bl9">
                         <div className="_li">
-                            <TopBar />
+                            <TopBar signOut={this.props.signOut} />
                             <div className="_3a_u">
                                 <div className="_4t5n" role="main">
                                     <Route exact path="/" render={() => <Home />} />
