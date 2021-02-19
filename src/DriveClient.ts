@@ -1,4 +1,4 @@
-import { MediaAttachmentData, PostWithAttachment } from './Posts';
+import { PostWithAttachment } from './Posts';
 
 const mainFolderName = 'facebookdata';
 
@@ -61,6 +61,34 @@ class DriveClient {
         }
         const posts = (await gapi.client.drive.files.get({ fileId: postsFileId, alt: 'media' })).result as PostWithAttachment[];
         return posts;
+    }
+
+    public async getAlbumFiles(): Promise<string[]> {
+        await this.init();
+
+        const photosAndVideosFolder = this.topicFolders!.find(f => f.name === 'photos_and_videos');
+        if (!photosAndVideosFolder) {
+            throw new Error('Could not find photos folder');
+        }
+        if (!photosAndVideosFolder.id) {
+            throw new Error('Photos folder has no ID');
+        }
+        const photosAndVideosFolderId = photosAndVideosFolder.id;
+
+        const albumFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${photosAndVideosFolderId}" in parents and name="album"` })).result.files!;
+        if (!albumFolders || albumFolders.length === 0) {
+            throw new Error('Could not fetch album folder');
+        }
+        if (albumFolders.length > 1) {
+            throw new Error('Found multiple album folders');
+        }
+        const albumFolderId = albumFolders[0].id!;
+        if (!albumFolderId) {
+            throw new Error('Album folder has no ID');
+        }
+
+        const albumFiles = (await gapi.client.drive.files.list({ q: `"${albumFolderId}" in parents` })).result.files!;
+        return albumFiles.filter(af => !!af.id).map(af => af.id!);
     }
 
 }

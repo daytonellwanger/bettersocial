@@ -34,6 +34,33 @@ export default class Home extends React.Component {
                         </table>
                     </div>
                 </div>
+                <div className="_4-u3 _2pi0">
+                    <div className="_4rt7">
+                        <div style={{ backgroundColor: '#FCD872' }} className="_4rtk">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfjAhkMCCoRrTJDAAABB0lEQVQoz23OwSpEcRzF8c9cg5JRjO5NE2GjJHslJXkA8goWNhRLNoqysCDPYEV5AQs7HkCy0iws3JvFTCih/hbGdcucX/0Wv9+3c04paGnFmaZMJs33vdtSmLZmTY83s+7EYkm+lx0IVyELwlioB/8mDiEypYlEin0v9hT1HHnXRCzDhl4bhXcsizQLwLFXxwUgkUYahYhtFTtgyaO5X4dG7vCrLedqLkz+RSRSIy6tY9ehCANWpeW8w6gTVfPqrnOn7j+Hmn1VRE5N+GwBX7JyXrLUOvY6yh1K0p+SHSraqfwT0a0qagv0eIo8mJS5bAt0+ii7salm0YxxI4YNSQzq16fLgq9vEs5itEngYdUAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTktMDItMjVUMjA6MDg6NDItMDg6MDD8QgZXAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE5LTAyLTI1VDIwOjA4OjQyLTA4OjAwjR++6wAAAABJRU5ErkJggg==" />
+                        </div>
+                        <div className="_4rt8 _21op">
+                            <div className="_4rt9">Photos and Videos</div>
+                            <div className="_4rtj">Photos and videos you've uploaded and shared</div>
+                        </div>
+                    </div>
+                    <div className="_4rtp">
+                        <table className="uiGrid _51mz _5f0n" cellSpacing="0" cellPadding="0">
+                            <tbody>
+                                <tr className="_51mx">
+                                    <td className="_51m- vTop pbs _51mw">
+                                        <Link to="/photos" className="_4rtt">Your Photos</Link>
+                                    </td>
+                                </tr>
+                                <tr className="_51mx">
+                                    <td className="_51m- vTop pbs _51mw">
+                                        <Link to="/videos" className="_4rtt">Your Videos</Link>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         );
     }

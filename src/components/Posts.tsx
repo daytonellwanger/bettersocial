@@ -1,7 +1,7 @@
 import React from 'react';
-import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
+import { decodeString, getTimeString } from '../util';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../Posts';
 import driveClient from '../DriveClient';
 import Image from './Image';
@@ -60,7 +60,7 @@ export default class Posts extends React.Component<{}, S> {
                     {this.renderAttachments(post as PostWithAttachment)}
                     {this.renderData(post)}
                 </div>
-                <div className="_3-94 _2lem">{moment(post.timestamp*1000).format('MMM Do, YYYY, h:mm A')}</div>
+                <div className="_3-94 _2lem">{getTimeString(post.timestamp)}</div>
             </div>
         );
     }
@@ -207,12 +207,4 @@ export default class Posts extends React.Component<{}, S> {
         );
     }
 
-}
-
-function decodeString(raw: string) {
-    const arr = [];
-    for (var i = 0; i < raw.length; i++) {
-        arr.push(raw.charCodeAt(i));
-    }
-    return Buffer.from(arr).toString('utf8');
 }

@@ -1,20 +1,15 @@
 import React from 'react';
 import { MediaAttachmentData } from '../Posts';
+import { getPhotoData, PhotoData } from '../util';
 import './Image.css';
 
 interface P {
     data: MediaAttachmentData;
 }
 
-interface S {
-    content: string;
-    webViewLink: string;
-    thumbnailLink: string;
-}
+export default class Image extends React.Component<P, PhotoData> {
 
-export default class Image extends React.Component<P, S> {
-
-    state: S = {
+    state: PhotoData = {
         content: '',
         webViewLink: '',
         thumbnailLink: ''
@@ -45,33 +40,4 @@ export default class Image extends React.Component<P, S> {
         }
     }
 
-}
-
-let getPhotoDataQueue: Promise<S | undefined> = Promise.resolve(undefined);
-
-async function getPhotoData(uri: string): Promise<S | undefined> {
-    getPhotoDataQueue = getPhotoDataQueue.then(async () => {
-        const uriPieces = uri.split('/');
-        const fileName = uriPieces[uriPieces.length - 1];
-        const photoFile = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
-        if (!(photoFile && photoFile.length === 1)) {
-            return;
-        }
-        const photoFileId = photoFile[0].id!;
-        if (!photoFileId) {
-            return;
-        }
-        // TODO: run these in parallel?
-        let photoContent = '';
-        if (fileName.endsWith('jpg')) {
-            photoContent = (await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' })).body;
-        }
-        const photoInfo = (await gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink, thumbnailLink' })).result;
-        return {
-            content: photoContent,
-            webViewLink: photoInfo.webViewLink!,
-            thumbnailLink: photoInfo.thumbnailLink!
-        };
-    });
-    return getPhotoDataQueue;
 }
