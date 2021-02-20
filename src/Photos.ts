@@ -1,6 +1,6 @@
 export interface Photo {
     uri: string;
-    creationTimestamp: number;
+    creation_timestamp: number;
     title: string;
     description?: string;
 }

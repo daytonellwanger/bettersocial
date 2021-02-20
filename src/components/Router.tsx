@@ -5,6 +5,7 @@ import TopBar from './TopBar';
 import Home from './Home';
 import Posts from './posts/Posts';
 import Photos from './photos/Photos';
+import Album from './photos/Album';
 
 interface P {
     signOut: () => void;
@@ -28,6 +29,7 @@ export default class Router extends React.Component<P> {
                                     <Route exact path="/" render={() => <Home />} />
                                     <Route exact path="/posts" render={() => <Posts />} />
                                     <Route exact path="/photos" render={() => <Photos />} />
+                                    <Route exact path="/album" component={Album} />
                                 </div>
                             </div>
                         </div>
