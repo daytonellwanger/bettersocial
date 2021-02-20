@@ -35,6 +35,8 @@ export default class AlbumCover extends React.Component<P, S> {
                     <div className="_3-94 _2lem">{getTimeString(this.state.album.last_modified_timestamp)}</div>
                 </div>
             );
+        } else {
+            return <img src="/empty-album.png" />
         }
     }
 
