@@ -26,7 +26,7 @@ export default class AlbumCover extends React.Component<P, S> {
         if (this.state.album) {
             return (
                 <div>
-                    <div className="_3-96 _2pio _2lek _2lel">{this.state.album.name} - {this.state.album.photos.length} photos</div>
+                    <div className="_3-96 _2pio _2lek _2lel">{this.state.album.name} - {this.state.album.photos.length} photo{this.state.album.photos.length === 1 ? '' : 's'}</div>
                     <div className="_3-96 _2let">
                         <a href="/photos">
                             <AlbumCoverImage uri={this.state.album.cover_photo.uri} />
