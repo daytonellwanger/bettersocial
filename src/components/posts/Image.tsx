@@ -1,6 +1,6 @@
 import React from 'react';
-import { MediaAttachmentData } from '../Posts';
-import { getPhotoData, PhotoData } from '../util';
+import { MediaAttachmentData } from '../../posts';
+import { getPhotoData, PhotoData } from '../../util';
 import './Image.css';
 
 interface P {

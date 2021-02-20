@@ -1,4 +1,4 @@
-import { PostWithAttachment } from './Posts';
+import { PostWithAttachment } from './posts';
 
 const mainFolderName = 'facebookdata';
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
-import { decodeString, getTimeString } from '../util';
-import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../Posts';
-import driveClient from '../DriveClient';
+import { decodeString, getTimeString } from '../../util';
+import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../../posts';
+import driveClient from '../../DriveClient';
 import Image from './Image';
 import './Posts.css';
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { getTimeString } from '../util';
-import { Album } from '../Photos';
+import { getTimeString } from '../../util';
+import { Album } from '../../photos';
 import AlbumCoverImage from './AlbumCoverImage';
 
 interface P {

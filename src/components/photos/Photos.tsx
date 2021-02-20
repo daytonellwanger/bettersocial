@@ -1,7 +1,7 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
-import driveClient from '../DriveClient';
+import driveClient from '../../DriveClient';
 import AlbumCover from './AlbumCover';
 import './Photos.css';
 

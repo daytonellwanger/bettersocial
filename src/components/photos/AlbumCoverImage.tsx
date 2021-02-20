@@ -1,6 +1,5 @@
 import React from 'react';
-import { getPhotoData, PhotoData } from '../util';
-import './Image.css';
+import { getPhotoData, PhotoData } from '../../util';
 
 interface P {
     uri: string;

@@ -3,8 +3,8 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import driveClient from '../DriveClient';
 import TopBar from './TopBar';
 import Home from './Home';
-import Posts from './Posts';
-import Photos from './Photos';
+import Posts from './posts/Posts';
+import Photos from './photos/Photos';
 
 interface P {
     signOut: () => void;
