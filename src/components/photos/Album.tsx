@@ -2,8 +2,8 @@ import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
 import { Album as AlbumData, Photo } from '../../photos';
+import Image from '../util/Image';
 import { getTimeString } from '../../util';
-import AlbumCoverImage from './AlbumCoverImage';
 
 const pageSize = 10;
 
@@ -44,9 +44,7 @@ export default class Album extends React.Component<P> {
         return (
             <div className="pam _3-95 _2pi0 _2lej uiBoxWhite noborder">
                 <div className="_3-96 _2let">
-                    <a href="">
-                        <AlbumCoverImage uri={photo.uri} />
-                    </a>
+                    <Image uri={photo.uri} link={true} />
                     {
                         photo.description
                             ? <div className="_3-95">{photo.description}</div>

@@ -1,10 +1,10 @@
 import React from 'react';
-import { MediaAttachmentData } from '../../posts';
 import { getPhotoData, PhotoData } from '../../util';
 import './Image.css';
 
 interface P {
-    data: MediaAttachmentData;
+    uri: string;
+    link?: boolean;
 }
 
 export default class Image extends React.Component<P, PhotoData> {
@@ -16,7 +16,7 @@ export default class Image extends React.Component<P, PhotoData> {
     }
 
     async componentDidMount() {
-        const photoData = await getPhotoData(this.props.data.media.uri);
+        const photoData = await getPhotoData(this.props.uri);
         if (photoData) {
             this.setState({ ...photoData });
         }
@@ -32,11 +32,17 @@ export default class Image extends React.Component<P, PhotoData> {
                 </a>
             );
         } else {
-            return (
-                <a href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
+            if (this.props.link) {
+                return (
+                    <a href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
+                        <img src={`data:image/jpeg;base64,${btoa(this.state.content)}`} className="_2yuc _3-96" />
+                    </a>
+                );
+            } else {
+                return (
                     <img src={`data:image/jpeg;base64,${btoa(this.state.content)}`} className="_2yuc _3-96" />
-                </a>
-            );
+                );
+            }
         }
     }
 

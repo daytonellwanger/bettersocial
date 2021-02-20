@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getTimeString } from '../../util';
+import Image from '../util/Image';
 import { Album } from '../../photos';
-import AlbumCoverImage from './AlbumCoverImage';
 
 interface P {
     id: string;
@@ -30,7 +30,7 @@ export default class AlbumCover extends React.Component<P, S> {
                     <div className="_3-96 _2pio _2lek _2lel">{this.state.album.name} - {this.state.album.photos.length} photo{this.state.album.photos.length === 1 ? '' : 's'}</div>
                     <div className="_3-96 _2let">
                         <Link to={{ pathname: '/album', state: { album: this.state.album } }}>
-                            <AlbumCoverImage uri={this.state.album.cover_photo.uri} />
+                            <Image uri={this.state.album.cover_photo.uri} />
                         </Link>
                     </div>
                     <div className="_3-94 _2lem">{getTimeString(this.state.album.last_modified_timestamp)}</div>

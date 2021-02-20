@@ -4,7 +4,7 @@ import PulseLoader from 'react-spinners/PulseLoader';
 import { decodeString, getTimeString } from '../../util';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../../posts';
 import driveClient from '../../DriveClient';
-import Image from './Image';
+import Image from '../util/Image';
 import './Posts.css';
 
 const pageSize = 25;
@@ -146,7 +146,7 @@ export default class Posts extends React.Component<{}, S> {
                                 <tr className="_51mx">
                                     <td className="_51m- pas">
                                         <div>
-                                            <Image data={data} />
+                                            <Image uri={data.media.uri} link={true} />
                                             <div className="_3-95">{data.media.description}</div>
                                         </div>
                                     </td>
