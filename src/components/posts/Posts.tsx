@@ -1,18 +1,15 @@
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
 import { decodeString, getTimeString } from '../../util';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../../posts';
 import driveClient from '../../DriveClient';
 import Image from '../util/Image';
 import './Posts.css';
-
-const pageSize = 25;
+import InfiniteScroller from '../util/InfiniteScroller';
 
 interface S {
     loading: boolean,
     posts: (Post | PostWithAttachment)[],
-    loadedPosts: (Post | PostWithAttachment)[],
     error?: string
 }
 
@@ -20,15 +17,13 @@ export default class Posts extends React.Component<{}, S> {
 
     state: S = {
         loading: true,
-        posts: [],
-        loadedPosts: []
+        posts: []
     };
 
     async componentDidMount() {
         try {
             const posts = (await driveClient.getPosts())!;
-            const loadedPosts = posts.slice(0, Math.min(pageSize, posts.length));
-            this.setState({ loading: false, posts, loadedPosts });
+            this.setState({ loading: false, posts });
         } catch (e) {
             this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
         }
@@ -171,30 +166,10 @@ export default class Posts extends React.Component<{}, S> {
             return <p>{this.state.error}</p>
         }
         return (
-            <InfiniteScroll
-                dataLength={this.state.loadedPosts.length}
-                next={() => {
-                    const loadedPosts = this.state.loadedPosts.concat(
-                        this.state.posts.slice(
-                            this.state.loadedPosts.length,
-                            Math.min(this.state.loadedPosts.length + pageSize, this.state.posts.length)
-                        )
-                    );
-                    this.setState({ ...this.state, loadedPosts });
-                }}
-                hasMore={this.state.posts.length > this.state.loadedPosts.length}
-                loader={
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                        <PulseLoader color="#7086ff" size={10} />
-                    </div>
-                }
-            >
-                {this.state.loadedPosts.map((p, idx) => (
-                    <div key={idx}>
-                        {this.renderPost(p)}
-                    </div>
-                ))}
-            </InfiniteScroll>
+            <InfiniteScroller
+                allItems={this.state.posts}
+                pageSize={25}
+                renderItem={(p: Post | PostWithAttachment) => this.renderPost(p)} />
         );
     }
 

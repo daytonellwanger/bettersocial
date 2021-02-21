@@ -1,16 +1,13 @@
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
 import driveClient from '../../DriveClient';
 import AlbumCover from './AlbumCover';
 import './Photos.css';
-
-const pageSize = 10;
+import InfiniteScroller from '../util/InfiniteScroller';
 
 interface S {
     loading: boolean;
     albums: string[];
-    loadedAlbums: string[];
     error?: string;
 }
 
@@ -18,15 +15,13 @@ export default class Photos extends React.Component<{}, S> {
 
     state: S = {
         loading: true,
-        albums: [],
-        loadedAlbums: []
+        albums: []
     }
 
     async componentDidMount() {
         try {
             const albums = (await driveClient.getAlbumFiles())!;
-            const loadedAlbums = albums.slice(0, Math.min(pageSize, albums.length));
-            this.setState({ loading: false, albums, loadedAlbums });
+            this.setState({ loading: false, albums });
         } catch (e) {
             this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
         }
@@ -57,32 +52,10 @@ export default class Photos extends React.Component<{}, S> {
         if (this.state.error) {
             return <p>{this.state.error}</p>
         }
-        return (
-            <InfiniteScroll
-                dataLength={this.state.loadedAlbums.length}
-                next={() => {
-                    const loadedAlbums = this.state.loadedAlbums.concat(
-                        this.state.albums.slice(
-                            this.state.loadedAlbums.length,
-                            Math.min(this.state.loadedAlbums.length + pageSize, this.state.albums.length)
-                        )
-                    );
-                    this.setState({ ...this.state, loadedAlbums });
-                }}
-                hasMore={this.state.albums.length > this.state.loadedAlbums.length}
-                loader={
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                        <PulseLoader color="#7086ff" size={10} />
-                    </div>
-                }
-            >
-                {this.state.loadedAlbums.map((a, idx) => (
-                    <div key={idx}>
-                        <AlbumCover id={a} />
-                    </div>
-                ))}
-            </InfiniteScroll>
-        );
+        return <InfiniteScroller
+                    allItems={this.state.albums}
+                    pageSize={10}
+                    renderItem={(a: string) => <AlbumCover id={a} />} />;
     }
 
     render() {

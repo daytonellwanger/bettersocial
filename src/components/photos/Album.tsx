@@ -1,11 +1,8 @@
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import PulseLoader from 'react-spinners/PulseLoader';
 import { Album as AlbumData, Photo } from '../../photos';
 import Image from '../util/Image';
 import { getTimeString } from '../../util';
-
-const pageSize = 10;
+import InfiniteScroller from '../util/InfiniteScroller';
 
 interface P {
     location: {
@@ -15,17 +12,7 @@ interface P {
     }
 }
 
-interface S {
-    photos: Photo[],
-    loadedPhotos: Photo[]
-}
-
 export default class Album extends React.Component<P> {
-
-    state: S = {
-        photos: this.props.location.state.album.photos,
-        loadedPhotos: this.props.location.state.album.photos.slice(0, Math.min(pageSize, this.props.location.state.album.photos.length))
-    };
 
     renderTopBar() {
         return (
@@ -58,30 +45,10 @@ export default class Album extends React.Component<P> {
 
     renderBody() {
         return (
-            <InfiniteScroll
-                dataLength={this.state.loadedPhotos.length}
-                next={() => {
-                    const loadedPhotos = this.state.loadedPhotos.concat(
-                        this.state.photos.slice(
-                            this.state.loadedPhotos.length,
-                            Math.min(this.state.loadedPhotos.length + pageSize, this.state.photos.length)
-                        )
-                    );
-                    this.setState({ ...this.state, loadedPhotos });
-                }}
-                hasMore={this.state.photos.length > this.state.loadedPhotos.length}
-                loader={
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                        <PulseLoader color="#7086ff" size={10} />
-                    </div>
-                }
-            >
-                {this.state.loadedPhotos.map((p, idx) => (
-                    <div key={idx}>
-                        {this.renderPhoto(p)}
-                    </div>
-                ))}
-            </InfiniteScroll>
+            <InfiniteScroller
+                    allItems={this.props.location.state.album.photos}
+                    pageSize={10}
+                    renderItem={(p: Photo) => this.renderPhoto(p)} />
         );
     }
 
