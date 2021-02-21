@@ -1,4 +1,5 @@
 import { PostWithAttachment } from './posts';
+import { Video } from './photos';
 
 const mainFolderName = 'facebookdata';
 
@@ -89,6 +90,34 @@ class DriveClient {
 
         const albumFiles = (await gapi.client.drive.files.list({ q: `"${albumFolderId}" in parents` })).result.files!;
         return albumFiles.filter(af => !!af.id).map(af => af.id!);
+    }
+
+    public async getVideos(): Promise<Video[]> {
+        await this.init();
+
+        const photosAndVideosFolder = this.topicFolders!.find(f => f.name === 'photos_and_videos');
+        if (!photosAndVideosFolder) {
+            throw new Error('Could not find photos folder');
+        }
+        if (!photosAndVideosFolder.id) {
+            throw new Error('Photos folder has no ID');
+        }
+        const photosAndVideosFolderId = photosAndVideosFolder.id;
+
+        const videosFiles = (await gapi.client.drive.files.list({ q: `"${photosAndVideosFolderId}" in parents and name="your_videos.json"` })).result.files!;
+        if (!videosFiles || videosFiles.length === 0) {
+            throw new Error('Could not find videos file');
+        }
+        if (videosFiles.length > 1) {
+            throw new Error('Found multiple videos files');
+        }
+        const videosFileId = videosFiles[0].id!;
+        if (!videosFileId) {
+            throw new Error('Videos file has no ID');
+        }
+
+        const videos = ((await gapi.client.drive.files.get({ fileId: videosFileId, alt: 'media' })).result as any).videos as Video[];
+        return videos;
     }
 
 }

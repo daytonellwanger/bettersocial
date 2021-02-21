@@ -27,7 +27,7 @@ export default class Image extends React.Component<P, PhotoData> {
             return (
                 <a href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
                     <div className='video-thumbnail'>
-                        <img src={this.state.thumbnailLink} className="_2yuc _3-96" />
+                        <img referrerPolicy="no-referrer" src={this.state.thumbnailLink} className="_2yuc _3-96" />
                     </div>
                 </a>
             );

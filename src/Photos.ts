@@ -12,3 +12,9 @@ export interface Album {
     last_modified_timestamp: number;
     description: string;
 }
+
+export interface Video {
+    uri: string;
+    creation_timestamp: number;
+    description: string;
+}
