@@ -1,5 +1,6 @@
 import { PostWithAttachment } from './posts';
 import { Video } from './photos';
+import { Comment } from './comments';
 
 const mainFolderName = 'facebookdata';
 
@@ -118,6 +119,34 @@ class DriveClient {
 
         const videos = ((await gapi.client.drive.files.get({ fileId: videosFileId, alt: 'media' })).result as any).videos as Video[];
         return videos;
+    }
+
+    public async getComments(): Promise<Comment[]> {
+        await this.init();
+
+        const commentsFolder = this.topicFolders!.find(f => f.name === 'comments');
+        if (!commentsFolder) {
+            throw new Error('Could not find comments folder');
+        }
+        if (!commentsFolder.id) {
+            throw new Error('Comments folder has no ID');
+        }
+        const commentsFolderId = commentsFolder.id;
+
+        const commentsFiles = (await gapi.client.drive.files.list({ q: `"${commentsFolderId}" in parents and name="comments.json"` })).result.files!;
+        if (!commentsFiles || commentsFiles.length === 0) {
+            throw new Error('Could not find comments file');
+        }
+        if (commentsFiles.length > 1) {
+            throw new Error('Found multiple comments files');
+        }
+        const commentsFileId = commentsFiles[0].id!;
+        if (!commentsFileId) {
+            throw new Error('Comments file has no ID');
+        }
+
+        const comments = ((await gapi.client.drive.files.get({ fileId: commentsFileId, alt: 'media' })).result as any).comments as Comment[];
+        return comments;
     }
 
 }

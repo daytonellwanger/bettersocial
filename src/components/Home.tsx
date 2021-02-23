@@ -61,6 +61,28 @@ export default class Home extends React.Component {
                         </table>
                     </div>
                 </div>
+                <div className="_4-u3 _2pi0">
+                    <div className="_4rt7">
+                        <div style={{ backgroundColor: '#F7923B' }} className="_4rtk">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfjAhsBIAbc+avSAAAAjUlEQVQoz62ROw7CMBBEnxPCERDHCb3Pyl04QVJQBgkJUSBsHoUV8ZEcGnaaleYVs7NBlqcBYMeJhG9KjEQAxGhtekEcqsAkQUi0lQCZVRCWcobmxxH8B8hVNxfgXAWOpai+2kMsRWF0MKv68K5qcrKXGcBO1ZuTWxFbu+K8/qNXD27kU/PSenHv+tuWJ8EkvUiVqwYRAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE5LTAyLTI3VDA5OjMyOjA2LTA4OjAw49wxUAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wMi0yN1QwOTozMjowNi0wODowMJKBiewAAAAASUVORK5CYII=" />
+                        </div>
+                        <div className="_4rt8 _21op">
+                            <div className="_4rt9">Comments</div>
+                            <div className="_4rtj">Comments you've posted on your own posts, on other people's posts or in groups you belong to</div>
+                        </div>
+                    </div>
+                    <div className="_4rtp">
+                        <table className="uiGrid _51mz _5f0n" cellSpacing="0" cellPadding="0">
+                            <tbody>
+                                <tr className="_51mx">
+                                    <td className="_51m- vTop pbs _51mw">
+                                        <Link to="/comments" className="_4rtt">Comments</Link>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         );
     }
