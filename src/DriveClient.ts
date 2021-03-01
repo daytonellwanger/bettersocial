@@ -174,7 +174,14 @@ class DriveClient {
             throw new Error('Inbox folder has no ID');
         }
 
-        const conversationFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${inboxFolderId}" in parents` })).result.files!;
+        const getNextResult = async (nextPageToken: string | undefined) => (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${inboxFolderId}" in parents`, pageToken: nextPageToken })).result;
+        const conversationFolders: gapi.client.drive.File[] = [];
+        let token = undefined;
+        do {
+            const nextResult: gapi.client.drive.FileList = await getNextResult(token);
+            conversationFolders.push(...nextResult.files!);
+            token = nextResult.nextPageToken!;
+        } while (token)
         return conversationFolders.filter(cf => !!cf.id && !!cf.name).map(cf => (
             {
                 name: cf.name!,
