@@ -83,6 +83,28 @@ export default class Home extends React.Component {
                         </table>
                     </div>
                 </div>
+                <div className="_4-u3 _2pi0">
+                    <div className="_4rt7">
+                        <div style={{ backgroundColor: '#3578E5' }} className='_4rtk'>
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfjBQkTGS0pU+syAAAA7UlEQVQoz32RsUoDURBFDxJDLJNFK0VJk85OQbSxyhekSBHIFwTS+Q3+gX6DFkGbdFpmCzF2axNSiI2ikoAKwrHYfSto1jPFPN5cmHsZJKsDT02cOzfxxP3wn7aaA38zsBYEkfcuIjFKBUOLGAo2/Y/mEh0CEvOZvV84AqCDk1zdFhuO1dhNe6pO8CN3nSaq2LLshjNV3/FJ1Znrlm1ZyWQh9jOOVO25ZayObYjtfO2oxAW7wAo3VIFtbrljJzd+iWu+FoZ8cxWxWyjohlscLxh+2f851uGf8ZV7aZ4SAFMeOeeMiDrLPHDNNLj8BpDDbHwVTUxTAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE5LTA1LTEwVDAyOjI1OjQ1LTA3OjAwLttmwQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wNS0xMFQwMjoyNTo0NS0wNzowMF+G3n0AAAAASUVORK5CYII=" />
+                        </div>
+                        <div className="_4rt8 _21op">
+                            <div className="_4rt9">Messages</div>
+                            <div className="_4rtj">Messages you've exchanged with other people on Messenger</div>
+                        </div>
+                    </div>
+                    <div className="_4rtp">
+                        <table className="uiGrid _51mz _5f0n" cellSpacing="0" cellPadding="0">
+                            <tbody>
+                                <tr className="_51mx">
+                                    <td className="_51m- vTop pbs _51mw">
+                                        <Link to="/messages" className="_4rtt">Your Messages</Link>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         );
     }

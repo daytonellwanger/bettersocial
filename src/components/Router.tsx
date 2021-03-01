@@ -8,6 +8,8 @@ import Photos from './photos/Photos';
 import Album from './photos/Album';
 import Videos from './videos/Videos';
 import CommentsComponent from './comments/Comments';
+import Messages from './messages/Messages';
+import Conversation from './messages/Conversation';
 
 interface P {
     signOut: () => void;
@@ -34,6 +36,8 @@ export default class Router extends React.Component<P> {
                                     <Route exact path="/album" component={Album} />
                                     <Route exact path="/videos" render={() => <Videos />} />
                                     <Route exact path="/comments" render={() => <CommentsComponent />} />
+                                    <Route exact path="/messages" render={() => <Messages /> } />
+                                    <Route exact path="/conversation" component={Conversation} />
                                 </div>
                             </div>
                         </div>

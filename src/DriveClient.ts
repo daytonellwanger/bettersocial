@@ -1,6 +1,7 @@
 import { PostWithAttachment } from './posts';
 import { Video } from './photos';
 import { Comment } from './comments';
+import { ConversationFolder } from './messages';
 
 const mainFolderName = 'facebookdata';
 
@@ -147,6 +148,39 @@ class DriveClient {
 
         const comments = ((await gapi.client.drive.files.get({ fileId: commentsFileId, alt: 'media' })).result as any).comments as Comment[];
         return comments;
+    }
+
+    public async getConversationFolders(): Promise<ConversationFolder[]> {
+        await this.init();
+
+        const messagesFolder = this.topicFolders!.find(f => f.name === 'messages');
+        if (!messagesFolder) {
+            throw new Error('Could not find messages folder');
+        }
+        if (!messagesFolder.id) {
+            throw new Error('Messages folder has no ID');
+        }
+        const messagesFolderId = messagesFolder.id;
+
+        const inboxFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${messagesFolderId}" in parents and name="inbox"` })).result.files!;
+        if (!inboxFolders || inboxFolders.length === 0) {
+            throw new Error('Could not fetch inbox folder');
+        }
+        if (inboxFolders.length > 1) {
+            throw new Error('Found multiple inbox folders');
+        }
+        const inboxFolderId = inboxFolders[0].id!;
+        if (!inboxFolderId) {
+            throw new Error('Inbox folder has no ID');
+        }
+
+        const conversationFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${inboxFolderId}" in parents` })).result.files!;
+        return conversationFolders.filter(cf => !!cf.id && !!cf.name).map(cf => (
+            {
+                name: cf.name!,
+                id: cf.id!
+            }
+        )).sort((a, b) => a.name.localeCompare(b.name));
     }
 
 }
