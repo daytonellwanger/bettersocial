@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { PostWithAttachment } from './posts';
-import { Video } from './photos';
+import { Album, AlbumIndex, Video } from './photos';
 import { Comment } from './comments';
 import { Conversation, ConversationFolder, ConversationIndex } from './messages';
 
@@ -182,6 +182,7 @@ class DriveClient {
         });
         await rootFolder.upload();
         await createConversationIndex(rootFolder);
+        await createAlbumIndex(rootFolder);
     }
 
 }
@@ -267,6 +268,31 @@ class Folder {
         }
     }
 
+}
+
+async function createAlbumIndex(root: Folder) {
+    const albumIndex: AlbumIndex = {
+        albums: []
+    };
+    
+    const albums = root.folders.find(f => f.name === 'photos_and_videos')?.folders.find(f => f.name === 'album')?.files!;
+    if (!albums) {
+        // complain
+        return;
+    }
+    
+    for (let albumFile of albums) {
+        const content = await albumFile.zip.async('string');
+        const album: Album = JSON.parse(content);
+        albumIndex.albums.push({
+            name: album.name,
+            numPhotos: album.photos.length,
+            photo: album.cover_photo.uri,
+            timestamp: album.last_modified_timestamp
+        });
+    }
+    
+    await uploadFile('albumIndex.json', root.id!, JSON.stringify(albumIndex, null, 2));
 }
 
 async function createConversationIndex(root: Folder) {

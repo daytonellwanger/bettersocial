@@ -18,3 +18,14 @@ export interface Video {
     creation_timestamp: number;
     description: string;
 }
+
+export interface AlbumIndexEntry {
+    name: string;
+    numPhotos: number;
+    photo: string;
+    timestamp: number;
+}
+
+export interface AlbumIndex {
+    albums: AlbumIndexEntry[];
+}
