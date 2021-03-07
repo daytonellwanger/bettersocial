@@ -35,3 +35,12 @@ export interface Conversation {
     thread_type: string;
     thread_path: string;
 }
+
+export interface ConversationIndexEntry {
+    title: string;
+    folderId: string;
+}
+
+export interface ConversationIndex {
+    conversations: ConversationIndexEntry[];
+}

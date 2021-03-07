@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 import { PostWithAttachment } from './posts';
 import { Video } from './photos';
 import { Comment } from './comments';
-import { ConversationFolder } from './messages';
+import { Conversation, ConversationFolder, ConversationIndex } from './messages';
 
 const mainFolderName = 'facebookdata';
 
@@ -200,11 +200,12 @@ class DriveClient {
             rootFolder.addFile(relativePath, file, false);
         });
         await rootFolder.upload();
+        await createConversationIndex(rootFolder);
     }
 
 }
 
-async function uploadFile(name: string, folderId: string, content: Blob) {
+async function uploadFile(name: string, folderId: string, content: string | Blob) {
     let mimeType = 'text/plain';
     if (name.endsWith('.jpg')) {
         mimeType = 'image/jpeg';
@@ -214,6 +215,9 @@ async function uploadFile(name: string, folderId: string, content: Blob) {
         mimeType,
         parents: [folderId]
     };
+    if (typeof content === 'string') {
+        content = new Blob([content], { type: 'text/plain' });
+    }
 
     const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
@@ -235,8 +239,9 @@ async function uploadFile(name: string, folderId: string, content: Blob) {
 
 class Folder {
 
-    private folders: Folder[];
-    private files: { name: string, zip: JSZip.JSZipObject }[] = [];
+    public readonly folders: Folder[];
+    public readonly files: { name: string, zip: JSZip.JSZipObject }[] = [];
+    public id: string | undefined;
 
     public constructor(public readonly name: string, folders: string[] = []) {
         this.folders = folders.map(folderName => new Folder(folderName));
@@ -271,16 +276,41 @@ class Folder {
             resource.parents = [parentId];
         }
         const result = (await gapi.client.drive.files.create({ resource })).result;
-        const id = result.id!;
+        this.id = result.id!;
         for (let childFolder of this.folders) {
-            await childFolder.upload(id);
+            await childFolder.upload(this.id);
         }
         for (let file of this.files) {
             const content = await file.zip.async('blob');
-            await uploadFile(file.name, id, content);
+            await uploadFile(file.name, this.id, content);
         }
     }
 
+}
+
+async function createConversationIndex(root: Folder) {
+    const conversationIndex: ConversationIndex = {
+        conversations: []
+    };
+    
+    const inbox = root.folders.find(f => f.name === 'messages')?.folders.find(f => f.name === 'inbox')?.folders!;
+    if (!inbox) {
+        // complain
+        return;
+    }
+    
+    for (let conversationFolder of inbox) {
+        const conversationFile = conversationFolder.files.find(f => f.name === 'message_1.json')!;
+        if (!conversationFile) {
+            // complain
+            continue;
+        }
+        const content = await conversationFile.zip.async('string');
+        const conversation: Conversation = JSON.parse(content);
+        conversationIndex.conversations.push({ folderId: conversationFolder.id!, title: conversation!.title });
+    }
+    
+    await uploadFile('conversationIndex.json', root.id!, JSON.stringify(conversationIndex, null, 2));
 }
 
 const driveClient = new DriveClient();
