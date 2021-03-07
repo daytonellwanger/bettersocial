@@ -4,12 +4,12 @@ import { Video } from './photos';
 import { Comment } from './comments';
 import { Conversation, ConversationFolder, ConversationIndex } from './messages';
 
-const mainFolderName = 'facebookdata';
+const mainFolderName = 'facebook-data';
 
 class DriveClient {
 
     private initPromise: Promise<void> | undefined;
-    private topicFolders: gapi.client.drive.File[] | undefined;
+    private root: gapi.client.drive.File[] | undefined;
 
     public async init() {
         if (!this.initPromise) {
@@ -28,9 +28,9 @@ class DriveClient {
                     reject(`Folder '${mainFolderName}' has no ID`);
                 }
 
-                this.topicFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${mainFolderId}" in parents` })).result.files!;
-                if (!this.topicFolders) {
-                    reject(`'${mainFolderName}' has no child folders`);
+                this.root = (await gapi.client.drive.files.list({ q: `"${mainFolderId}" in parents` })).result.files!;
+                if (!this.root) {
+                    reject(`'${mainFolderName}' has no children`);
                     return;
                 }
 
@@ -43,7 +43,7 @@ class DriveClient {
     public async getPosts() {
         await this.init();
 
-        const postsFolder = this.topicFolders!.find(f => f.name === 'posts');
+        const postsFolder = this.root!.find(f => f.name === 'posts');
         if (!postsFolder) {
             throw new Error('Could not find posts folder');
         }
@@ -70,7 +70,7 @@ class DriveClient {
     public async getAlbumFiles(): Promise<string[]> {
         await this.init();
 
-        const photosAndVideosFolder = this.topicFolders!.find(f => f.name === 'photos_and_videos');
+        const photosAndVideosFolder = this.root!.find(f => f.name === 'photos_and_videos');
         if (!photosAndVideosFolder) {
             throw new Error('Could not find photos folder');
         }
@@ -98,7 +98,7 @@ class DriveClient {
     public async getVideos(): Promise<Video[]> {
         await this.init();
 
-        const photosAndVideosFolder = this.topicFolders!.find(f => f.name === 'photos_and_videos');
+        const photosAndVideosFolder = this.root!.find(f => f.name === 'photos_and_videos');
         if (!photosAndVideosFolder) {
             throw new Error('Could not find photos folder');
         }
@@ -126,7 +126,7 @@ class DriveClient {
     public async getComments(): Promise<Comment[]> {
         await this.init();
 
-        const commentsFolder = this.topicFolders!.find(f => f.name === 'comments');
+        const commentsFolder = this.root!.find(f => f.name === 'comments');
         if (!commentsFolder) {
             throw new Error('Could not find comments folder');
         }
@@ -154,45 +154,26 @@ class DriveClient {
     public async getConversationFolders(): Promise<ConversationFolder[]> {
         await this.init();
 
-        const messagesFolder = this.topicFolders!.find(f => f.name === 'messages');
-        if (!messagesFolder) {
-            throw new Error('Could not find messages folder');
-        }
-        if (!messagesFolder.id) {
-            throw new Error('Messages folder has no ID');
-        }
-        const messagesFolderId = messagesFolder.id;
-
-        const inboxFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${messagesFolderId}" in parents and name="inbox"` })).result.files!;
-        if (!inboxFolders || inboxFolders.length === 0) {
-            throw new Error('Could not fetch inbox folder');
-        }
-        if (inboxFolders.length > 1) {
-            throw new Error('Found multiple inbox folders');
-        }
-        const inboxFolderId = inboxFolders[0].id!;
-        if (!inboxFolderId) {
-            throw new Error('Inbox folder has no ID');
+        const conversationIndexFile = this.root!.find(f => f.name === 'conversationIndex.json')!;
+        if (!conversationIndexFile) {
+            throw new Error('Could not find conversation index');
         }
 
-        const getNextResult = async (nextPageToken: string | undefined) => (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${inboxFolderId}" in parents`, pageToken: nextPageToken })).result;
-        const conversationFolders: gapi.client.drive.File[] = [];
-        let token = undefined;
-        do {
-            const nextResult: gapi.client.drive.FileList = await getNextResult(token);
-            conversationFolders.push(...nextResult.files!);
-            token = nextResult.nextPageToken!;
-        } while (token)
-        return conversationFolders.filter(cf => !!cf.id && !!cf.name).map(cf => (
+        const conversationIndex = (await gapi.client.drive.files.get({ fileId: conversationIndexFile.id!, alt: 'media' })).result as ConversationIndex;
+        if (!conversationIndex) {
+            throw new Error('Could not read conversation index');
+        }
+
+        return conversationIndex.conversations.map(c => (
             {
-                name: cf.name!,
-                id: cf.id!
+                name: c.title,
+                id: c.folderId
             }
         )).sort((a, b) => a.name.localeCompare(b.name));
     }
 
     public async uploadFiles(zip: JSZip) {
-        const rootFolder = new Folder('facebook-data', ['posts', 'comments', 'messages', 'photos_and_videos']);
+        const rootFolder = new Folder(mainFolderName, ['posts', 'comments', 'messages', 'photos_and_videos']);
         zip.forEach((relativePath, file) => {
             if (file.dir) {
                 return;
