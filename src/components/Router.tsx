@@ -10,6 +10,7 @@ import Videos from './videos/Videos';
 import CommentsComponent from './comments/Comments';
 import Messages from './messages/Messages';
 import Conversation from './messages/Conversation';
+import Upload from './Upload';
 
 interface P {
     signOut: () => void;
@@ -38,6 +39,7 @@ export default class Router extends React.Component<P> {
                                     <Route exact path="/comments" render={() => <CommentsComponent />} />
                                     <Route exact path="/messages" render={() => <Messages /> } />
                                     <Route exact path="/conversation" component={Conversation} />
+                                    <Route exact path="/upload" render={() => <Upload />} />
                                 </div>
                             </div>
                         </div>

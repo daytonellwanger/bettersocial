@@ -1,3 +1,4 @@
+import JSZip from 'jszip';
 import { PostWithAttachment } from './posts';
 import { Video } from './photos';
 import { Comment } from './comments';
@@ -188,6 +189,96 @@ class DriveClient {
                 id: cf.id!
             }
         )).sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    public async uploadFiles(zip: JSZip) {
+        const rootFolder = new Folder('facebook-data', ['posts', 'comments', 'messages', 'photos_and_videos']);
+        zip.forEach((relativePath, file) => {
+            if (file.dir) {
+                return;
+            }
+            rootFolder.addFile(relativePath, file, false);
+        });
+        await rootFolder.upload();
+    }
+
+}
+
+async function uploadFile(name: string, folderId: string, content: Blob) {
+    let mimeType = 'text/plain';
+    if (name.endsWith('.jpg')) {
+        mimeType = 'image/jpeg';
+    }
+    const metadata = {
+        name,
+        mimeType,
+        parents: [folderId]
+    };
+
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', content);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+    xhr.responseType = 'json';
+
+    let resolvePromise: (value: XMLHttpRequest) => void;
+    const result = new Promise<XMLHttpRequest>((resolve, reject) => { resolvePromise = resolve; });
+    xhr.onload = () => {
+        resolvePromise(xhr);
+    };
+    xhr.send(form);
+    return result;
+}
+
+class Folder {
+
+    private folders: Folder[];
+    private files: { name: string, zip: JSZip.JSZipObject }[] = [];
+
+    public constructor(public readonly name: string, folders: string[] = []) {
+        this.folders = folders.map(folderName => new Folder(folderName));
+    }
+
+    public addFile(relativePath: string, file: JSZip.JSZipObject, createTopFolder = true) {
+        const pathPieces = relativePath.split('/');
+        if (pathPieces.length === 1) {
+            this.files.push({ name: pathPieces[0], zip: file });
+            return;
+        }
+
+        const topFolderName = pathPieces[0];
+        let folder = this.folders.find(f => f.name === topFolderName);
+        if (!folder) {
+            if (!createTopFolder) {
+                return;
+            }
+            folder = new Folder(topFolderName);
+            this.folders.push(folder);
+        }
+
+        folder.addFile(relativePath.substr(topFolderName.length + 1), file);
+    }
+
+    public async upload(parentId?: string) {
+        const resource: gapi.client.drive.File = {
+            name: this.name,
+            mimeType: 'application/vnd.google-apps.folder'
+        };
+        if (parentId) {
+            resource.parents = [parentId];
+        }
+        const result = (await gapi.client.drive.files.create({ resource })).result;
+        const id = result.id!;
+        for (let childFolder of this.folders) {
+            await childFolder.upload(id);
+        }
+        for (let file of this.files) {
+            const content = await file.zip.async('blob');
+            await uploadFile(file.name, id, content);
+        }
     }
 
 }

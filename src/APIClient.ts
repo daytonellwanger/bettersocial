@@ -11,7 +11,7 @@ export default class APIClient {
             apiKey: 'AIzaSyB4SEgW3JCa8BcCJs7_85scJ_tFGnWD3NE',
             discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
             clientId: '1061292514174-dakput8vml1a9lk1o0qffgrg8mhtsvci.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/drive.readonly'
+            scope: 'https://www.googleapis.com/auth/drive.file'
         });
         gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateSignInStatus);
         this.updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
