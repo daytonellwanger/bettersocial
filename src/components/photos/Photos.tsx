@@ -1,13 +1,14 @@
 import React from 'react';
 import PulseLoader from 'react-spinners/PulseLoader';
 import driveClient from '../../DriveClient';
+import { AlbumIndexEntry } from '../../photos';
 import AlbumCover from './AlbumCover';
 import './Photos.css';
 import InfiniteScroller from '../util/InfiniteScroller';
 
 interface S {
     loading: boolean;
-    albums: string[];
+    albums: AlbumIndexEntry[];
     error?: string;
 }
 
@@ -55,7 +56,7 @@ export default class Photos extends React.Component<{}, S> {
         return <InfiniteScroller
                     allItems={this.state.albums}
                     pageSize={10}
-                    renderItem={(a: string) => <AlbumCover id={a} />} />;
+                    renderItem={(a: AlbumIndexEntry) => <AlbumCover album={a} />} />;
     }
 
     render() {

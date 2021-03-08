@@ -12,7 +12,7 @@ export default class ConversationTitle extends React.Component<P> {
         return (
             <div className="pam _3-95 _2pi0 _2lej uiBoxWhite noborder">
                 <div className="_2lek">
-                    <Link to={{ pathname: '/conversation', state: { id: this.props.conversationFolder.id } }}>{this.props.conversationFolder.name}</Link>
+                    <Link to={{ pathname: '/conversation', state: { id: this.props.conversationFolder.id, name: this.props.conversationFolder.name } }}>{this.props.conversationFolder.name}</Link>
                 </div>
             </div>
         );

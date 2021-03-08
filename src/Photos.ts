@@ -20,6 +20,7 @@ export interface Video {
 }
 
 export interface AlbumIndexEntry {
+    id: string;
     name: string;
     numPhotos: number;
     photo: string;

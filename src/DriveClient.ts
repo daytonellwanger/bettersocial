@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { PostWithAttachment } from './posts';
-import { Album, AlbumIndex, Video } from './photos';
+import { Album, AlbumIndex, AlbumIndexEntry, Video } from './photos';
 import { Comment } from './comments';
 import { Conversation, ConversationFolder, ConversationIndex } from './messages';
 
@@ -67,32 +67,21 @@ class DriveClient {
         return posts;
     }
 
-    public async getAlbumFiles(): Promise<string[]> {
+    public async getAlbumFiles(): Promise<AlbumIndexEntry[]> {
         await this.init();
 
-        const photosAndVideosFolder = this.root!.find(f => f.name === 'photos_and_videos');
-        if (!photosAndVideosFolder) {
-            throw new Error('Could not find photos folder');
-        }
-        if (!photosAndVideosFolder.id) {
-            throw new Error('Photos folder has no ID');
-        }
-        const photosAndVideosFolderId = photosAndVideosFolder.id;
-
-        const albumFolders = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${photosAndVideosFolderId}" in parents and name="album"` })).result.files!;
-        if (!albumFolders || albumFolders.length === 0) {
-            throw new Error('Could not fetch album folder');
-        }
-        if (albumFolders.length > 1) {
-            throw new Error('Found multiple album folders');
-        }
-        const albumFolderId = albumFolders[0].id!;
-        if (!albumFolderId) {
-            throw new Error('Album folder has no ID');
+        const albumIndexFile = this.root!.find(f => f.name === 'albumIndex.json')!;
+        if (!albumIndexFile) {
+            throw new Error('Could not find album index');
         }
 
-        const albumFiles = (await gapi.client.drive.files.list({ q: `"${albumFolderId}" in parents` })).result.files!;
-        return albumFiles.filter(af => !!af.id).map(af => af.id!);
+        const albumIndex = (await gapi.client.drive.files.get({ fileId: albumIndexFile.id!, alt: 'media' })).result! as AlbumIndex;
+        if (!albumIndex) {
+            throw new Error('Could not read album index');
+        }
+
+        albumIndex.albums.sort((a, b) => b.timestamp - a.timestamp);
+        return albumIndex.albums;
     }
 
     public async getVideos(): Promise<Video[]> {
@@ -222,7 +211,7 @@ async function uploadFile(name: string, folderId: string, content: string | Blob
 class Folder {
 
     public readonly folders: Folder[];
-    public readonly files: { name: string, zip: JSZip.JSZipObject }[] = [];
+    public readonly files: { id?: string, name: string, zip: JSZip.JSZipObject }[] = [];
     public id: string | undefined;
 
     public constructor(public readonly name: string, folders: string[] = []) {
@@ -264,7 +253,8 @@ class Folder {
         }
         for (let file of this.files) {
             const content = await file.zip.async('blob');
-            await uploadFile(file.name, this.id, content);
+            const result = await uploadFile(file.name, this.id, content);
+            file.id = result.response.id;
         }
     }
 
@@ -285,6 +275,7 @@ async function createAlbumIndex(root: Folder) {
         const content = await albumFile.zip.async('string');
         const album: Album = JSON.parse(content);
         albumIndex.albums.push({
+            id: albumFile.id!,
             name: album.name,
             numPhotos: album.photos.length,
             photo: album.cover_photo.uri,

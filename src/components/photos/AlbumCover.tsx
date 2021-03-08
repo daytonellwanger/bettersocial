@@ -2,43 +2,26 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { getTimeString } from '../../util';
 import Image from '../util/Image';
-import { Album } from '../../photos';
+import { AlbumIndexEntry } from '../../photos';
 
 interface P {
-    id: string;
+    album: AlbumIndexEntry;
 }
 
-interface S {
-    album?: Album;
-}
-
-export default class AlbumCover extends React.Component<P, S> {
-
-    state: S = {}
-
-    async componentDidMount() {
-        const album = await getAlbum(this.props.id);
-        if (album) {
-            this.setState({ album });
-        }
-    }
+export default class AlbumCover extends React.Component<P> {
 
     renderBody() {
-        if (this.state.album) {
-            return (
-                <div>
-                    <div className="_3-96 _2pio _2lek _2lel">{this.state.album.name} - {this.state.album.photos.length} photo{this.state.album.photos.length === 1 ? '' : 's'}</div>
-                    <div className="_3-96 _2let">
-                        <Link to={{ pathname: '/album', state: { album: this.state.album } }}>
-                            <Image uri={this.state.album.cover_photo.uri} />
-                        </Link>
-                    </div>
-                    <div className="_3-94 _2lem">{getTimeString(this.state.album.last_modified_timestamp)}</div>
+        return (
+            <div>
+                <div className="_3-96 _2pio _2lek _2lel">{this.props.album.name} - {this.props.album.numPhotos} photo{this.props.album.numPhotos === 1 ? '' : 's'}</div>
+                <div className="_3-96 _2let">
+                    <Link to={{ pathname: '/album', state: { id: this.props.album.id, name: this.props.album.name } }}>
+                        <Image uri={this.props.album.photo} />
+                    </Link>
                 </div>
-            );
-        } else {
-            return <img src="/empty-album.png" />
-        }
+                <div className="_3-94 _2lem">{getTimeString(this.props.album.timestamp)}</div>
+            </div>
+        );
     }
 
     render() {
@@ -49,13 +32,4 @@ export default class AlbumCover extends React.Component<P, S> {
         );
     }
 
-}
-
-let getAlbumQueue: Promise<Album | undefined> = Promise.resolve(undefined);
-async function getAlbum(id: string): Promise<Album | undefined> {
-    getAlbumQueue = getAlbumQueue.then(async () => {
-        const album: Album = (await gapi.client.drive.files.get({ fileId: id, alt: 'media' })).result as Album;
-        return album;
-    });
-    return getAlbumQueue;
 }
