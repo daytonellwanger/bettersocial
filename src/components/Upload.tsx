@@ -9,7 +9,7 @@ interface S {
     uploading: boolean;
     progress: number;
     message: string;
-    dragOver: boolean;
+    itemOverDropZone: boolean;
 }
 
 class Upload extends React.Component<RouteComponentProps, S> {
@@ -18,7 +18,7 @@ class Upload extends React.Component<RouteComponentProps, S> {
         uploading: false,
         progress: 0,
         message: '',
-        dragOver: false
+        itemOverDropZone: false
     };
 
     private inputRef: HTMLInputElement | null = null;
@@ -35,15 +35,15 @@ class Upload extends React.Component<RouteComponentProps, S> {
                 <div style={{ padding: '10px' }}>
                     <p>Welcome to Social Freedom! To get started, upload your Facebook data file.</p>
                     <div style={uploadContainerStyle}>
-                        <div style={this.state.dragOver ? activeDropZoneStyle : inactiveDropZoneStyle}
+                        <div style={this.state.itemOverDropZone ? activeDropZoneStyle : inactiveDropZoneStyle}
                             onDrop={(event) => this.handleDropFile(event)}
                             onDragOver={(event) => {
                                 event.preventDefault();
-                                this.setState({ ...this.state, dragOver: true })
+                                this.setState({ ...this.state, itemOverDropZone: true })
                             }}
                             onDragLeave={(event) => {
                                 event.preventDefault();
-                                this.setState({ ...this.state, dragOver: false })
+                                this.setState({ ...this.state, itemOverDropZone: false })
                             }}>
                             Drag and drop here
                         </div>
