@@ -1,33 +1,55 @@
 import React from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import CSS from 'csstype';
 import JSZip from 'jszip';
 import driveClient from '../DriveClient';
+import ProgressBar from './util/ProgressBar';
 
-export default class Upload extends React.Component {
+interface S {
+    uploading: boolean;
+    progress: number;
+    message: string;
+}
+
+class Upload extends React.Component<RouteComponentProps, S> {
+
+    state: S = {
+        uploading: false,
+        progress: 0,
+        message: ''
+    };
 
     private inputRef: HTMLInputElement | null = null;
 
     render() {
-        return (
-            <div>
-                <p>Welcome to Social Freedom! To get started, upload your Facebook data file.</p>
-                <div style={uploadContainerStyle}>
-                    <div style={dropZoneStyle}
-                        onDrop={(event) => this.handleDropFile(event)}
-                        onDragOver={(event) => event.preventDefault()}>
-                        Drag and drop here
-                    </div>
-                    <p>or select with the file picker</p>
-                    <form>
-                        <input
-                            type="file"
-                            accept=".zip"
-                            onChange={() => this.handleFileInput()}
-                            ref={ref => this.inputRef = ref} />
-                    </form>
+        if (this.state.uploading) {
+            return (
+                <div style={progressContainerStyle}>
+                    <ProgressBar progress={this.state.progress} message={this.state.message} />
                 </div>
-            </div >
-        );
+            )
+        } else {
+            return (
+                <div style={{ padding: '10px' }}>
+                    <p>Welcome to Social Freedom! To get started, upload your Facebook data file.</p>
+                    <div style={uploadContainerStyle}>
+                        <div style={dropZoneStyle}
+                            onDrop={(event) => this.handleDropFile(event)}
+                            onDragOver={(event) => event.preventDefault()}>
+                            Drag and drop here
+                        </div>
+                        <p>or select with the file picker</p>
+                        <form>
+                            <input
+                                type="file"
+                                accept=".zip"
+                                onChange={() => this.handleFileInput()}
+                                ref={ref => this.inputRef = ref} />
+                        </form>
+                    </div>
+                </div >
+            );
+        }
     }
 
     private async handleDropFile(event: React.DragEvent) {
@@ -64,16 +86,28 @@ export default class Upload extends React.Component {
     }
 
     private async uploadFile(file: File) {
+        this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zip = await JSZip.loadAsync(file!);
-        await driveClient.uploadFiles(zip);
+        await driveClient.uploadFiles(zip, (progress, message) => this.setState({ progress, message }));
+        this.props.history.push('/');
     }
 
 }
 
+export default withRouter(Upload);
+
+const progressContainerStyle: CSS.Properties = {
+    width: '100%',
+    height: '100%',
+    padding: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+};
+
 const uploadContainerStyle: CSS.Properties = {
     width: '100%',
     height: '100%',
-    paddingTop: '10px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center'

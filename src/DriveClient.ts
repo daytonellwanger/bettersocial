@@ -161,17 +161,29 @@ class DriveClient {
         )).sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    public async uploadFiles(zip: JSZip) {
-        const rootFolder = new Folder(mainFolderName, ['posts', 'comments', 'messages', 'photos_and_videos']);
+    public async uploadFiles(zip: JSZip, uploadListener: (progress: number, message: string) => void) {
+        let totalFiles = 0;
+        let uploadedFiles = 0;
+        const fileUploadListener = () => {
+            uploadedFiles++;
+            const progress = (uploadedFiles / totalFiles) * .95;
+            uploadListener(progress, `Uploading files: ${uploadedFiles+1}/${totalFiles}`);
+        }
+        const rootFolder = new Folder(mainFolderName, ['posts', 'comments', 'messages', 'photos_and_videos'], fileUploadListener);
         zip.forEach((relativePath, file) => {
             if (file.dir) {
                 return;
             }
             rootFolder.addFile(relativePath, file, false);
         });
+        totalFiles = rootFolder.getNumFiles();
+        uploadListener(0, `Uploading files: 1/${totalFiles}`);
         await rootFolder.upload();
+        uploadListener(.97, 'Creating conversation index');
         await createConversationIndex(rootFolder);
+        uploadListener(.99, 'Creating album index');
         await createAlbumIndex(rootFolder);
+        uploadListener(1, 'Done');
     }
 
 }
@@ -214,8 +226,16 @@ class Folder {
     public readonly files: { id?: string, name: string, zip: JSZip.JSZipObject }[] = [];
     public id: string | undefined;
 
-    public constructor(public readonly name: string, folders: string[] = []) {
-        this.folders = folders.map(folderName => new Folder(folderName));
+    public constructor(public readonly name: string, folders: string[] = [], private uploadListener?: () => void) {
+        this.folders = folders.map(folderName => new Folder(folderName, undefined, uploadListener));
+    }
+
+    public getNumFiles() {
+        let numFiles = this.files.length;
+        for (let folder of this.folders) {
+            numFiles += folder.getNumFiles();
+        }
+        return numFiles;
     }
 
     public addFile(relativePath: string, file: JSZip.JSZipObject, createTopFolder = true) {
@@ -231,7 +251,7 @@ class Folder {
             if (!createTopFolder) {
                 return;
             }
-            folder = new Folder(topFolderName);
+            folder = new Folder(topFolderName, undefined, this.uploadListener);
             this.folders.push(folder);
         }
 
@@ -255,6 +275,9 @@ class Folder {
             const content = await file.zip.async('blob');
             const result = await uploadFile(file.name, this.id, content);
             file.id = result.response.id;
+            if (this.uploadListener) {
+                this.uploadListener();
+            }
         }
     }
 
