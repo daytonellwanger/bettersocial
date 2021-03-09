@@ -9,6 +9,7 @@ interface S {
     uploading: boolean;
     progress: number;
     message: string;
+    dragOver: boolean;
 }
 
 class Upload extends React.Component<RouteComponentProps, S> {
@@ -16,7 +17,8 @@ class Upload extends React.Component<RouteComponentProps, S> {
     state: S = {
         uploading: false,
         progress: 0,
-        message: ''
+        message: '',
+        dragOver: false
     };
 
     private inputRef: HTMLInputElement | null = null;
@@ -33,9 +35,16 @@ class Upload extends React.Component<RouteComponentProps, S> {
                 <div style={{ padding: '10px' }}>
                     <p>Welcome to Social Freedom! To get started, upload your Facebook data file.</p>
                     <div style={uploadContainerStyle}>
-                        <div style={dropZoneStyle}
+                        <div style={this.state.dragOver ? activeDropZoneStyle : inactiveDropZoneStyle}
                             onDrop={(event) => this.handleDropFile(event)}
-                            onDragOver={(event) => event.preventDefault()}>
+                            onDragOver={(event) => {
+                                event.preventDefault();
+                                this.setState({ ...this.state, dragOver: true })
+                            }}
+                            onDragLeave={(event) => {
+                                event.preventDefault();
+                                this.setState({ ...this.state, dragOver: false })
+                            }}>
                             Drag and drop here
                         </div>
                         <p>or select with the file picker</p>
@@ -113,8 +122,7 @@ const uploadContainerStyle: CSS.Properties = {
     alignItems: 'center'
 };
 
-const dropZoneStyle: CSS.Properties = {
-    backgroundColor: '#ddddea',
+const baseDropZoneStyle: CSS.Properties = {
     border: 'dotted',
     borderWidth: '1px',
     borderColor: '#aaaaaa',
@@ -126,3 +134,13 @@ const dropZoneStyle: CSS.Properties = {
     justifyContent: 'center',
     alignItems: 'center'
 };
+
+const inactiveDropZoneStyle: CSS.Properties = {
+    ...baseDropZoneStyle,
+    backgroundColor: '#ddddea'
+}
+
+const activeDropZoneStyle: CSS.Properties = {
+    ...baseDropZoneStyle,
+    backgroundColor: '#4267b249'
+}
