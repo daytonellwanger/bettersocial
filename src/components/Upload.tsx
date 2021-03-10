@@ -1,9 +1,12 @@
 import React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
 import CSS from 'csstype';
 import JSZip from 'jszip';
 import driveClient from '../DriveClient';
 import ProgressBar from './util/ProgressBar';
+
+interface P {
+    onUploadComplete: () => void;
+}
 
 interface S {
     uploading: boolean;
@@ -12,7 +15,7 @@ interface S {
     itemOverDropZone: boolean;
 }
 
-class Upload extends React.Component<RouteComponentProps, S> {
+export default class Upload extends React.Component<P, S> {
 
     state: S = {
         uploading: false,
@@ -98,12 +101,10 @@ class Upload extends React.Component<RouteComponentProps, S> {
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zip = await JSZip.loadAsync(file!);
         await driveClient.uploadFiles(zip, (progress, message) => this.setState({ progress, message }));
-        this.props.history.push('/');
+        this.props.onUploadComplete();
     }
 
 }
-
-export default withRouter(Upload);
 
 const progressContainerStyle: CSS.Properties = {
     width: '100%',

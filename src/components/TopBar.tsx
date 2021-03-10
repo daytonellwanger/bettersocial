@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './TopBar.css';
 
 interface P {
+    homeEnabled: boolean;
     signOut: () => void;
 }
 
@@ -27,7 +28,7 @@ export default class TopBar extends React.Component<P> {
                                 <div aria-label="Facebook" className="_2t-f" role="navigation">
                                     <div className="_cy6" id="bluebar_profile_and_home">
                                         <div className="_4kny _2s24">
-                                            <Link className="_2s25 _cy7" to="/" title="Home">Home</Link>
+                                            {this.props.homeEnabled ? <Link className="_2s25 _cy7" to="/" title="Home">Home</Link> : undefined}
                                             <a className="_2s25 _cy7" onClick={this.props.signOut}>Log Out</a>
                                         </div>
                                     </div>

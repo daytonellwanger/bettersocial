@@ -11,8 +11,8 @@ class DriveClient {
     private initPromise: Promise<void> | undefined;
     private root: gapi.client.drive.File[] | undefined;
 
-    public async init() {
-        if (!this.initPromise) {
+    public async init(force = false) {
+        if (!this.initPromise || force) {
             this.initPromise = new Promise<void>(async (resolve, reject) => {
                 const mainFolder = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and name = '${mainFolderName}'` })).result.files!;
                 if (!mainFolder || mainFolder.length === 0) {
