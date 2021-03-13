@@ -190,13 +190,8 @@ class DriveClient {
 }
 
 async function uploadFile(name: string, folderId: string, content: string | Blob) {
-    let mimeType = 'text/plain';
-    if (name.endsWith('.jpg')) {
-        mimeType = 'image/jpeg';
-    }
     const metadata = {
         name,
-        mimeType,
         parents: [folderId]
     };
     if (typeof content === 'string') {

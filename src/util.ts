@@ -74,7 +74,7 @@ type PendingRequest = {
 
 class RequestQueue {
 
-    private static readonly maxParallelRequests = 10000;
+    private static readonly maxParallelRequests = 30;
     private activeRequests = 0;
     private pendingRequests: PendingRequest[] = [];
 
