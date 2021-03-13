@@ -18,32 +18,28 @@ export interface PhotoData {
     thumbnailLink: string;
 };
 
-let getDataQueue: Promise<PhotoData | FileData | undefined> = Promise.resolve(undefined);
-export async function getPhotoData(uri: string): Promise<PhotoData> {
-    getDataQueue = getDataQueue.then(async () => {
-        const uriPieces = uri.split('/');
-        const fileName = uriPieces[uriPieces.length - 1];
-        const photoFile = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
-        if (!(photoFile && photoFile.length === 1)) {
-            return;
-        }
-        const photoFileId = photoFile[0].id!;
-        if (!photoFileId) {
-            return;
-        }
-        // TODO: run these in parallel?
-        let photoContent = '';
-        if (fileName.endsWith('jpg')) {
-            photoContent = (await gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' })).body;
-        }
-        const photoInfo = (await gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink, thumbnailLink' })).result;
-        return {
-            content: photoContent,
-            webViewLink: photoInfo.webViewLink!,
-            thumbnailLink: photoInfo.thumbnailLink!
-        };
-    });
-    return getDataQueue as Promise<PhotoData>;
+export async function getPhotoData(uri: string): Promise<PhotoData | undefined> {
+    const uriPieces = uri.split('/');
+    const fileName = uriPieces[uriPieces.length - 1];
+    const photoFile = (await requestQueue.request(() => gapi.client.drive.files.list({ q: `name = '${fileName}'` }))).result.files!;
+    if (!(photoFile && photoFile.length === 1)) {
+        return;
+    }
+    const photoFileId = photoFile[0].id!;
+    if (!photoFileId) {
+        return;
+    }
+    // TODO: run these in parallel?
+    let photoContent = '';
+    if (fileName.endsWith('jpg')) {
+        photoContent = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' }))).body;
+    }
+    const photoInfo = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink, thumbnailLink' }))).result;
+    return {
+        content: photoContent,
+        webViewLink: photoInfo.webViewLink!,
+        thumbnailLink: photoInfo.thumbnailLink!
+    };
 }
 
 export interface FileData {
@@ -52,24 +48,66 @@ export interface FileData {
     iconLink: string;
 };
 
-export async function getFileData(uri: string): Promise<FileData> {
-    getDataQueue = getDataQueue.then(async () => {
-        const uriPieces = uri.split('/');
-        const fileName = uriPieces[uriPieces.length - 1];
-        const file = (await gapi.client.drive.files.list({ q: `name = '${fileName}'` })).result.files!;
-        if (!(file && file.length === 1)) {
-            return;
-        }
-        const fileId = file[0].id!;
-        if (!fileId) {
-            return;
-        }
-        const fileInfo = (await gapi.client.drive.files.get({ fileId, fields: 'name, webViewLink, iconLink' })).result;
-        return {
-            name: fileInfo.name!,
-            webViewLink: fileInfo.webViewLink!,
-            iconLink: fileInfo.iconLink!
-        };
-    });
-    return getDataQueue as Promise<FileData>;
+export async function getFileData(uri: string): Promise<FileData | undefined> {
+    const uriPieces = uri.split('/');
+    const fileName = uriPieces[uriPieces.length - 1];
+    const file = (await requestQueue.request(() => gapi.client.drive.files.list({ q: `name = '${fileName}'` }))).result.files!;
+    if (!(file && file.length === 1)) {
+        return;
+    }
+    const fileId = file[0].id!;
+    if (!fileId) {
+        return;
+    }
+    const fileInfo = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId, fields: 'name, webViewLink, iconLink' }))).result;
+    return {
+        name: fileInfo.name!,
+        webViewLink: fileInfo.webViewLink!,
+        iconLink: fileInfo.iconLink!
+    };
 }
+
+type PendingRequest = {
+    executeRequest: () => Promise<any>,
+    resolveResult: (result: any) => void
+};
+
+class RequestQueue {
+
+    private static readonly maxParallelRequests = 10000;
+    private activeRequests = 0;
+    private pendingRequests: PendingRequest[] = [];
+
+    public async request<T>(executeRequest: () => Promise<T>): Promise<T> {
+        if (this.activeRequests < RequestQueue.maxParallelRequests) {
+            this.activeRequests++;
+            const result = await executeRequest();
+            this.activeRequests--;
+            this.processNextRequest();
+            return result;
+        } else {
+            let resolveResult: (result: any) => void;
+            const result = new Promise<any>((resolve, reject) => {
+                resolveResult = resolve;
+            });
+            const pendingRequest: PendingRequest = {
+                executeRequest,
+                resolveResult: resolveResult!
+            }
+            this.pendingRequests.push(pendingRequest);
+            return result;
+        }
+    }
+
+    private async processNextRequest() {
+        if (this.pendingRequests.length === 0) {
+            return;
+        }
+        const nextRequest = this.pendingRequests.splice(0, 1)[0];
+        const result = await this.request(nextRequest.executeRequest);
+        nextRequest.resolveResult(result);
+    }
+
+}
+
+export const requestQueue = new RequestQueue();

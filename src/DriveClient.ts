@@ -1,4 +1,5 @@
 import JSZip from 'jszip';
+import { requestQueue } from './util';
 import { PostWithAttachment } from './posts';
 import { Album, AlbumIndex, AlbumIndexEntry, Video } from './photos';
 import { Comment } from './comments';
@@ -167,7 +168,7 @@ class DriveClient {
         const fileUploadListener = () => {
             uploadedFiles++;
             const progress = (uploadedFiles / totalFiles) * .95;
-            uploadListener(progress, `Uploading files: ${uploadedFiles+1}/${totalFiles}`);
+            uploadListener(progress, `Uploading files: ${uploadedFiles + 1}/${totalFiles}`);
         }
         const rootFolder = new Folder(mainFolderName, ['posts', 'comments', 'messages', 'photos_and_videos'], fileUploadListener);
         zip.forEach((relativePath, file) => {
@@ -206,18 +207,20 @@ async function uploadFile(name: string, folderId: string, content: string | Blob
     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
     form.append('file', content);
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id');
-    xhr.setRequestHeader('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
-    xhr.responseType = 'json';
+    return requestQueue.request(() => {
+        var xhr = new XMLHttpRequest();
+        xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+        xhr.responseType = 'json';
 
-    let resolvePromise: (value: XMLHttpRequest) => void;
-    const result = new Promise<XMLHttpRequest>((resolve, reject) => { resolvePromise = resolve; });
-    xhr.onload = () => {
-        resolvePromise(xhr);
-    };
-    xhr.send(form);
-    return result;
+        let resolvePromise: (value: XMLHttpRequest) => void;
+        const result = new Promise<XMLHttpRequest>((resolve, reject) => { resolvePromise = resolve; });
+        xhr.onload = () => {
+            resolvePromise(xhr);
+        };
+        xhr.send(form);
+        return result;
+    });
 }
 
 class Folder {
@@ -231,7 +234,7 @@ class Folder {
     }
 
     public getNumFiles() {
-        let numFiles = this.files.length;
+        let numFiles = this.files.length + 1;
         for (let folder of this.folders) {
             numFiles += folder.getNumFiles();
         }
@@ -266,19 +269,27 @@ class Folder {
         if (parentId) {
             resource.parents = [parentId];
         }
-        const result = (await gapi.client.drive.files.create({ resource })).result;
-        this.id = result.id!;
-        for (let childFolder of this.folders) {
-            await childFolder.upload(this.id);
+        const result = (await requestQueue.request(() => gapi.client.drive.files.create({ resource }))).result;
+        if (this.uploadListener) {
+            this.uploadListener();
         }
-        for (let file of this.files) {
+        this.id = result.id!;
+        const uploadPromises: Promise<void>[] = [];
+        for (let childFolder of this.folders) {
+            uploadPromises.push(childFolder.upload(this.id));
+        }
+        const uploadFileFunction = async (file: { id?: string, name: string, zip: JSZip.JSZipObject }, parentId: string) => {
             const content = await file.zip.async('blob');
-            const result = await uploadFile(file.name, this.id, content);
+            const result = await uploadFile(file.name, parentId, content);
             file.id = result.response.id;
             if (this.uploadListener) {
                 this.uploadListener();
             }
+        };
+        for (let file of this.files) {
+            uploadPromises.push(uploadFileFunction(file, this.id));
         }
+        await Promise.all(uploadPromises);
     }
 
 }
@@ -287,13 +298,13 @@ async function createAlbumIndex(root: Folder) {
     const albumIndex: AlbumIndex = {
         albums: []
     };
-    
+
     const albums = root.folders.find(f => f.name === 'photos_and_videos')?.folders.find(f => f.name === 'album')?.files!;
     if (!albums) {
         // complain
         return;
     }
-    
+
     for (let albumFile of albums) {
         const content = await albumFile.zip.async('string');
         const album: Album = JSON.parse(content);
@@ -305,7 +316,7 @@ async function createAlbumIndex(root: Folder) {
             timestamp: album.last_modified_timestamp
         });
     }
-    
+
     await uploadFile('albumIndex.json', root.id!, JSON.stringify(albumIndex, null, 2));
 }
 
@@ -313,13 +324,13 @@ async function createConversationIndex(root: Folder) {
     const conversationIndex: ConversationIndex = {
         conversations: []
     };
-    
+
     const inbox = root.folders.find(f => f.name === 'messages')?.folders.find(f => f.name === 'inbox')?.folders!;
     if (!inbox) {
         // complain
         return;
     }
-    
+
     for (let conversationFolder of inbox) {
         const conversationFile = conversationFolder.files.find(f => f.name === 'message_1.json')!;
         if (!conversationFile) {
@@ -330,7 +341,7 @@ async function createConversationIndex(root: Folder) {
         const conversation: Conversation = JSON.parse(content);
         conversationIndex.conversations.push({ folderId: conversationFolder.id!, title: conversation!.title });
     }
-    
+
     await uploadFile('conversationIndex.json', root.id!, JSON.stringify(conversationIndex, null, 2));
 }
 
