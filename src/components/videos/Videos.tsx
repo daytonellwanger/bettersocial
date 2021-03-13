@@ -1,14 +1,13 @@
 import React from 'react';
 import PulseLoader from 'react-spinners/PulseLoader';
 import driveClient from '../../DriveClient';
-import { Video } from '../../photos';
+import { Video, VideosInfo } from '../../photos';
 import { decodeString, getTimeString } from '../../util';
 import Image from '../util/Image';
 import InfiniteScroller from '../util/InfiniteScroller';
 
-interface S {
+interface S extends VideosInfo {
     loading: boolean;
-    videos: Video[];
     error?: string;
 }
 
@@ -21,8 +20,8 @@ export default class Videos extends React.Component<{}, S> {
 
     async componentDidMount() {
         try {
-            const videos = (await driveClient.getVideos())!;
-            this.setState({ loading: false, videos });
+            const videosInfo = (await driveClient.getVideos())!;
+            this.setState({ loading: false, ...videosInfo });
         } catch (e) {
             this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
         }
@@ -37,6 +36,7 @@ export default class Videos extends React.Component<{}, S> {
                 <div className="_3b0c">
                     <div className="_3b0d">Your Videos</div>
                     <div className="_3b0e">Videos you've uploaded and shared</div>
+                    <a href={this.state.videosFolderLink} target="_blank">View on Google</a>
                 </div>
             </div>
         );

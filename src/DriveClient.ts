@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import { requestQueue } from './util';
 import { PostWithAttachment } from './posts';
-import { Album, AlbumIndex, AlbumIndexEntry, Video } from './photos';
+import { Album, AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './photos';
 import { Comment } from './comments';
 import { Conversation, ConversationFolder, ConversationIndex } from './messages';
 
@@ -85,7 +85,7 @@ class DriveClient {
         return albumIndex.albums;
     }
 
-    public async getVideos(): Promise<Video[]> {
+    public async getVideos(): Promise<VideosInfo> {
         await this.init();
 
         const photosAndVideosFolder = this.root!.find(f => f.name === 'photos_and_videos');
@@ -109,8 +109,17 @@ class DriveClient {
             throw new Error('Videos file has no ID');
         }
 
+        let videosFolderLink: string | undefined;
+        const videosFolder = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${photosAndVideosFolderId}" in parents and name="videos"` })).result.files!;
+        if (videosFolder && videosFolder.length === 1 && videosFolder[0].id) {
+            videosFolderLink = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: videosFolder[0].id!, fields: 'webViewLink' }))).result.webViewLink!;
+        }
+
         const videos = ((await gapi.client.drive.files.get({ fileId: videosFileId, alt: 'media' })).result as any).videos as Video[];
-        return videos;
+        return {
+            videos,
+            videosFolderLink
+        };
     }
 
     public async getComments(): Promise<Comment[]> {

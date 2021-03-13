@@ -16,9 +16,10 @@ export interface PhotoData {
     content: string;
     webViewLink: string;
     thumbnailLink: string;
+    parentFolderLink?: string;
 };
 
-export async function getPhotoData(uri: string): Promise<PhotoData | undefined> {
+export async function getPhotoData(uri: string, includeParentFolderLink = false): Promise<PhotoData | undefined> {
     const uriPieces = uri.split('/');
     const fileName = uriPieces[uriPieces.length - 1];
     const photoFile = (await requestQueue.request(() => gapi.client.drive.files.list({ q: `name = '${fileName}'` }))).result.files!;
@@ -34,11 +35,17 @@ export async function getPhotoData(uri: string): Promise<PhotoData | undefined> 
     if (fileName.endsWith('jpg')) {
         photoContent = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' }))).body;
     }
-    const photoInfo = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink, thumbnailLink' }))).result;
+    const photoInfo = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink, thumbnailLink, parents' }))).result;
+
+    let parentFolderLink: string | undefined;
+    if (includeParentFolderLink) {
+        parentFolderLink = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoInfo.parents![0], fields: 'webViewLink' }))).result.webViewLink!;
+    }
     return {
         content: photoContent,
         webViewLink: photoInfo.webViewLink!,
-        thumbnailLink: photoInfo.thumbnailLink!
+        thumbnailLink: photoInfo.thumbnailLink!,
+        parentFolderLink
     };
 }
 

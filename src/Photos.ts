@@ -19,6 +19,11 @@ export interface Video {
     description: string;
 }
 
+export interface VideosInfo {
+    videos: Video[];
+    videosFolderLink?: string;
+}
+
 export interface AlbumIndexEntry {
     id: string;
     name: string;

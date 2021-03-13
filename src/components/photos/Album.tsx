@@ -1,9 +1,14 @@
 import React from 'react';
 import { Album as AlbumData, Photo } from '../../photos';
 import Image from '../util/Image';
-import { getTimeString } from '../../util';
+import { getPhotoData, getTimeString } from '../../util';
 import PulseLoader from 'react-spinners/PulseLoader';
 import InfiniteScroller from '../util/InfiniteScroller';
+
+interface AlbumInfo {
+    album?: AlbumData;
+    albumFolderLink?: string;
+}
 
 interface P {
     location: {
@@ -14,9 +19,8 @@ interface P {
     }
 }
 
-interface S {
+interface S extends AlbumInfo {
     loading: boolean;
-    album?: AlbumData;
     error?: string;
 }
 
@@ -29,7 +33,7 @@ export default class Album extends React.Component<P, S> {
     async componentDidMount() {
         try {
             const album = await getAlbum(this.props.location.state.id);
-            this.setState({ loading: false, album });
+            this.setState({ loading: false, ...album });
         } catch (e) {
             this.setState({ loading: false, error: e });
         }
@@ -43,6 +47,7 @@ export default class Album extends React.Component<P, S> {
                 </div>
                 <div className="_3b0c">
                     <div className="_3b0d">{this.props.location.state.name}</div>
+                    <a href={this.state.albumFolderLink} target="_blank">View on Google</a>
                 </div>
             </div>
         );
@@ -96,7 +101,8 @@ export default class Album extends React.Component<P, S> {
 
 }
 
-async function getAlbum(id: string): Promise<AlbumData | undefined> {
+async function getAlbum(id: string): Promise<AlbumInfo> {
     const album: AlbumData = (await gapi.client.drive.files.get({ fileId: id, alt: 'media' })).result as AlbumData;
-    return album;
+    const albumFolderLink = (await getPhotoData(album.cover_photo.uri, true))?.parentFolderLink!;
+    return { album, albumFolderLink };
 }
