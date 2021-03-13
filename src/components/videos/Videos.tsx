@@ -1,30 +1,22 @@
 import React from 'react';
-import PulseLoader from 'react-spinners/PulseLoader';
 import driveClient from '../../DriveClient';
-import { Video, VideosInfo } from '../../photos';
+import { Video } from '../../photos';
 import { decodeString, getTimeString } from '../../util';
 import Image from '../util/Image';
 import InfiniteScroller from '../util/InfiniteScroller';
 
-interface S extends VideosInfo {
-    loading: boolean;
-    error?: string;
+interface S {
+    folderLink?: string;
 }
 
 export default class Videos extends React.Component<{}, S> {
 
-    state: S = {
-        loading: true,
-        videos: []
-    }
+    state: S = {};
 
-    async componentDidMount() {
-        try {
-            const videosInfo = (await driveClient.getVideos())!;
-            this.setState({ loading: false, ...videosInfo });
-        } catch (e) {
-            this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
-        }
+    async fetchVideos() {
+        const videosInfo = (await driveClient.getVideos())!;
+        this.setState({ folderLink: videosInfo.videosFolderLink });
+        return videosInfo.videos;
     }
 
     renderTopBar() {
@@ -36,7 +28,7 @@ export default class Videos extends React.Component<{}, S> {
                 <div className="_3b0c">
                     <div className="_3b0d">Your Videos</div>
                     <div className="_3b0e">Videos you've uploaded and shared</div>
-                    <a href={this.state.videosFolderLink} target="_blank">View on Google</a>
+                    <a href={this.state.folderLink} target="_blank">View on Google</a>
                 </div>
             </div>
         );
@@ -55,20 +47,10 @@ export default class Videos extends React.Component<{}, S> {
     }
 
     renderBody() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        }
-        if (this.state.error) {
-            return <p>{this.state.error}</p>
-        }
         return (
             <div className="_4t5n" role="main">
                 <InfiniteScroller
-                        allItems={this.state.videos} 
+                        fetchRequests={[() => this.fetchVideos()]}
                         pageSize={10}
                         renderItem={(video: Video) => this.renderVideo(video)} />
             </div>

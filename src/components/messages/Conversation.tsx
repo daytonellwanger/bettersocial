@@ -1,5 +1,4 @@
 import React from 'react';
-import PulseLoader from 'react-spinners/PulseLoader';
 import { Conversation as ConversationData, Message as MessageData } from '../../messages';
 import InfiniteScroller from '../util/InfiniteScroller';
 import Message from './Message';
@@ -13,26 +12,7 @@ interface P {
     }
 }
 
-interface S {
-    loading: boolean;
-    conversation?: ConversationData;
-    error?: string;
-}
-
-export default class Conversation extends React.Component<P, S> {
-
-    state: S = {
-        loading: true
-    };
-
-    async componentDidMount() {
-        try {
-            const conversation = await getConversation(this.props.location.state.id);
-            this.setState({ loading: false, conversation });
-        } catch (e) {
-            this.setState({ loading: false, error: e });
-        }
-    }
+export default class Conversation extends React.Component<P> {
 
     renderTopBar() {
         return (
@@ -48,20 +28,14 @@ export default class Conversation extends React.Component<P, S> {
     }
 
     renderBody() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        }
-        if (this.state.error) {
-            return <p>{this.state.error.toString()}</p>
-        }
         return (
             <div className="_4t5n" role="main">
                 <InfiniteScroller
-                    allItems={this.state.conversation!.messages}
+                    getFetchRequests={async () => {
+                        const conversationRequests = await getConversationsRequests(this.props.location.state.id);
+                        return conversationRequests;
+                    }}
+                    fetchRequests={[]}
                     pageSize={25}
                     renderItem={(m: MessageData) => <Message message={m} />} />
             </div>
@@ -79,23 +53,18 @@ export default class Conversation extends React.Component<P, S> {
 
 }
 
-let getConversationQueue: Promise<ConversationData | undefined> = Promise.resolve(undefined);
-async function getConversation(folderId: string): Promise<ConversationData | undefined> {
-    getConversationQueue = getConversationQueue.then(async () => {
-        // TODO limit to file type (i.e. exclude folders. Limit to JSON.
-        const conversationFiles = (await gapi.client.drive.files.list({ q: `"${folderId}" in parents and name contains 'message_'` })).result.files!;
-        if (!conversationFiles || conversationFiles.length === 0) {
-            throw new Error('Could not find conversation file');
-        }
-        // TODO add support for multiple conversation files, as this happens
-        // when chat history gets long
-        const conversationFileId = conversationFiles[0].id!;
-        if (!conversationFileId) {
-            throw new Error('Conversation file has no ID');
-        }
+async function getConversationsRequests(folderId: string): Promise<(() => Promise<MessageData[]>)[]> {
+    const conversationPages = (await gapi.client.drive.files.list({ q: `"${folderId}" in parents and name contains 'message_'` })).result.files!;
+    if (!conversationPages || conversationPages.length === 0) {
+        throw new Error('Could not find conversation file');
+    }
 
-        const conversation = (await gapi.client.drive.files.get({ fileId: conversationFileId, alt: 'media' })).result as ConversationData;
-        return conversation;
+    const conversationsRequests = conversationPages.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
+        return async () => {
+            const conversation = (await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as ConversationData;
+            return conversation.messages;
+        }
     });
-    return getConversationQueue;
+
+    return conversationsRequests;
 }

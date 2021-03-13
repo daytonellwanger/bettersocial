@@ -2,7 +2,6 @@ import React from 'react';
 import { Album as AlbumData, Photo } from '../../photos';
 import Image from '../util/Image';
 import { getPhotoData, getTimeString } from '../../util';
-import PulseLoader from 'react-spinners/PulseLoader';
 import InfiniteScroller from '../util/InfiniteScroller';
 
 interface AlbumInfo {
@@ -19,24 +18,18 @@ interface P {
     }
 }
 
-interface S extends AlbumInfo {
-    loading: boolean;
-    error?: string;
+interface S {
+    folderLink?: string;
 }
 
 export default class Album extends React.Component<P, S> {
 
-    state: S = {
-        loading: true
-    };
+    state: S = {};
 
-    async componentDidMount() {
-        try {
-            const album = await getAlbum(this.props.location.state.id);
-            this.setState({ loading: false, ...album });
-        } catch (e) {
-            this.setState({ loading: false, error: e });
-        }
+    async fetchPhotos() {
+        const album = await getAlbum(this.props.location.state.id);
+        this.setState({ folderLink: album?.albumFolderLink });
+        return album?.album?.photos || [];
     }
 
     renderTopBar() {
@@ -47,7 +40,7 @@ export default class Album extends React.Component<P, S> {
                 </div>
                 <div className="_3b0c">
                     <div className="_3b0d">{this.props.location.state.name}</div>
-                    <a href={this.state.albumFolderLink} target="_blank">View on Google</a>
+                    <a href={this.state.folderLink} target="_blank">View on Google</a>
                 </div>
             </div>
         );
@@ -70,19 +63,9 @@ export default class Album extends React.Component<P, S> {
     }
 
     renderBody() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        }
-        if (this.state.error) {
-            return <p>{this.state.error}</p>
-        }
         return (
             <InfiniteScroller
-                allItems={this.state.album!.photos}
+                fetchRequests={[() => this.fetchPhotos()]}
                 pageSize={10}
                 renderItem={(p: Photo) => this.renderPhoto(p)} />
         );

@@ -53,19 +53,17 @@ class DriveClient {
         }
         const postsFolderId = postsFolder.id;
 
-        const postsFile = (await gapi.client.drive.files.list({ q: `"${postsFolderId}" in parents and name contains 'your_posts'` })).result.files!;
-        if (!postsFile || postsFile.length === 0) {
+        const postsFiles = (await gapi.client.drive.files.list({ q: `"${postsFolderId}" in parents and name contains 'your_posts'` })).result.files!;
+        if (!postsFiles || postsFiles.length === 0) {
             throw new Error('Posts folder has no children');
         }
-        if (postsFile.length > 1) {
-            throw new Error('Posts folder has multiple children');
-        }
-        const postsFileId = postsFile[0].id!;
-        if (!postsFileId) {
-            throw new Error('Posts file has no ID');
-        }
-        const posts = (await gapi.client.drive.files.get({ fileId: postsFileId, alt: 'media' })).result as PostWithAttachment[];
-        return posts;
+
+        return postsFiles.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
+            return async () => {
+                const posts = (await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as PostWithAttachment[];
+                return posts;
+            }
+        });
     }
 
     public async getAlbumFiles(): Promise<AlbumIndexEntry[]> {
@@ -122,7 +120,7 @@ class DriveClient {
         };
     }
 
-    public async getComments(): Promise<Comment[]> {
+    public async getComments() {
         await this.init();
 
         const commentsFolder = this.root!.find(f => f.name === 'comments');
@@ -134,20 +132,17 @@ class DriveClient {
         }
         const commentsFolderId = commentsFolder.id;
 
-        const commentsFiles = (await gapi.client.drive.files.list({ q: `"${commentsFolderId}" in parents and name="comments.json"` })).result.files!;
+        const commentsFiles = (await gapi.client.drive.files.list({ q: `"${commentsFolderId}" in parents and name contains "comments"` })).result.files!;
         if (!commentsFiles || commentsFiles.length === 0) {
             throw new Error('Could not find comments file');
         }
-        if (commentsFiles.length > 1) {
-            throw new Error('Found multiple comments files');
-        }
-        const commentsFileId = commentsFiles[0].id!;
-        if (!commentsFileId) {
-            throw new Error('Comments file has no ID');
-        }
 
-        const comments = ((await gapi.client.drive.files.get({ fileId: commentsFileId, alt: 'media' })).result as any).comments as Comment[];
-        return comments;
+        return commentsFiles.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
+            return async () => {
+                const comments = ((await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as any).comments as Comment[];
+                return comments;
+            }
+        });
     }
 
     public async getConversationFolders(): Promise<ConversationFolder[]> {

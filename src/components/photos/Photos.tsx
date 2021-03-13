@@ -1,32 +1,11 @@
 import React from 'react';
-import PulseLoader from 'react-spinners/PulseLoader';
 import driveClient from '../../DriveClient';
 import { AlbumIndexEntry } from '../../photos';
 import AlbumCover from './AlbumCover';
 import './Photos.css';
 import InfiniteScroller from '../util/InfiniteScroller';
 
-interface S {
-    loading: boolean;
-    albums: AlbumIndexEntry[];
-    error?: string;
-}
-
-export default class Photos extends React.Component<{}, S> {
-
-    state: S = {
-        loading: true,
-        albums: []
-    }
-
-    async componentDidMount() {
-        try {
-            const albums = (await driveClient.getAlbumFiles())!;
-            this.setState({ loading: false, albums });
-        } catch (e) {
-            this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
-        }
-    }
+export default class Photos extends React.Component {
 
     renderTopBar() {
         return (
@@ -43,18 +22,11 @@ export default class Photos extends React.Component<{}, S> {
     }
 
     renderAlbums() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        }
-        if (this.state.error) {
-            return <p>{this.state.error}</p>
-        }
         return <InfiniteScroller
-                    allItems={this.state.albums}
+                    fetchRequests={[async () => {
+                        const albums = (await driveClient.getAlbumFiles())!;
+                        return albums;
+                    }]}
                     pageSize={10}
                     renderItem={(a: AlbumIndexEntry) => <AlbumCover album={a} />} />;
     }

@@ -1,31 +1,10 @@
 import React from 'react';
-import PulseLoader from 'react-spinners/PulseLoader';
 import driveClient from '../../DriveClient';
 import { ConversationFolder } from '../../messages';
 import InfiniteScroller from '../util/InfiniteScroller';
 import ConversationTitle from './ConversationTitle';
 
-interface S {
-    loading: boolean;
-    conversations: ConversationFolder[];
-    error?: string;
-}
-
-export default class Messages extends React.Component<{}, S> {
-
-    state: S = {
-        loading: true,
-        conversations: []
-    }
-
-    async componentDidMount() {
-        try {
-            const conversations = await driveClient.getConversationFolders();
-            this.setState({ loading: false, conversations });
-        } catch (e) {
-            this.setState({ loading: false, error: e });
-        }
-    }
+export default class Messages extends React.Component {
 
     renderTopBar() {
         return (
@@ -42,20 +21,13 @@ export default class Messages extends React.Component<{}, S> {
     }
 
     renderBody() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        }
-        if (this.state.error) {
-            return <p>{this.state.error.toString()}</p>
-        }
         return (
             <div className="_4t5n" role="main">
                 <InfiniteScroller
-                    allItems={this.state.conversations}
+                    fetchRequests={[async () => {
+                        const conversations = await driveClient.getConversationFolders();
+                        return conversations;
+                    }]}
                     pageSize={25}
                     renderItem={(cf: ConversationFolder) => <ConversationTitle conversationFolder={cf} />} />
             </div>

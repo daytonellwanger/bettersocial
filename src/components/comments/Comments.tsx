@@ -1,30 +1,10 @@
 import React from 'react';
-import PulseLoader from 'react-spinners/PulseLoader';
 import driveClient from '../../DriveClient';
 import { Comment } from '../../comments';
 import { decodeString, getTimeString } from '../../util';
+import InfiniteScroller from '../util/InfiniteScroller';
 
-interface S {
-    loading: boolean;
-    comments: Comment[];
-    error?: string;
-}
-
-export default class CommentsComponent extends React.Component<{}, S> {
-
-    state: S = {
-        loading: true,
-        comments: []
-    }
-
-    async componentDidMount() {
-        try {
-            const comments = (await driveClient.getComments())!;
-            this.setState({ loading: false, comments });
-        } catch (e) {
-            this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
-        }
-    }
+export default class CommentsComponent extends React.Component {
 
     renderTopBar() {
         return (
@@ -67,23 +47,16 @@ export default class CommentsComponent extends React.Component<{}, S> {
     }
 
     renderBody() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        }
-        if (this.state.error) {
-            return <p>{this.state.error}</p>
-        }
         return (
             <div className="_4t5n" role="main">
-                {this.state.comments.map((comment, idx) => (
-                    <div key={idx}>
-                        {this.renderComment(comment)}
-                    </div>
-                ))}
+                <InfiniteScroller
+                    getFetchRequests={async () => {
+                        const comments = (await driveClient.getComments())!;
+                        return comments;
+                    }}
+                    fetchRequests={[]}
+                    pageSize={25}
+                    renderItem={(c: Comment) => this.renderComment(c)} />
             </div>
         );
     }

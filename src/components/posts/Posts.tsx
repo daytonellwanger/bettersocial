@@ -1,5 +1,4 @@
 import React from 'react';
-import PulseLoader from 'react-spinners/PulseLoader';
 import { decodeString, getTimeString } from '../../util';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, PostWithAttachment } from '../../posts';
 import driveClient from '../../DriveClient';
@@ -7,27 +6,7 @@ import Image from '../util/Image';
 import './Posts.css';
 import InfiniteScroller from '../util/InfiniteScroller';
 
-interface S {
-    loading: boolean,
-    posts: (Post | PostWithAttachment)[],
-    error?: string
-}
-
-export default class Posts extends React.Component<{}, S> {
-
-    state: S = {
-        loading: true,
-        posts: []
-    };
-
-    async componentDidMount() {
-        try {
-            const posts = (await driveClient.getPosts())!;
-            this.setState({ loading: false, posts });
-        } catch (e) {
-            this.setState({ loading: false, error: JSON.stringify(e, null, 2) });
-        }
-    }
+export default class Posts extends React.Component {
 
     renderPostsTopBar() {
         return (
@@ -155,19 +134,13 @@ export default class Posts extends React.Component<{}, S> {
     }
 
     renderBody() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        }
-        if (this.state.error) {
-            return <p>{this.state.error}</p>
-        }
         return (
             <InfiniteScroller
-                allItems={this.state.posts}
+                getFetchRequests={async () => {
+                    const posts = (await driveClient.getPosts())!;
+                    return posts;
+                }}
+                fetchRequests={[]}
                 pageSize={25}
                 renderItem={(p: Post | PostWithAttachment) => this.renderPost(p)} />
         );
