@@ -1,5 +1,6 @@
 import React from 'react';
 import { Conversation as ConversationData, Message as MessageData } from '../../messages';
+import ContentContainer from '../ContentContainer';
 import InfiniteScroller from '../util/InfiniteScroller';
 import Message from './Message';
 
@@ -29,25 +30,23 @@ export default class Conversation extends React.Component<P> {
 
     renderBody() {
         return (
-            <div className="_4t5n" role="main">
-                <InfiniteScroller
-                    getFetchRequests={async () => {
-                        const conversationRequests = await getConversationsRequests(this.props.location.state.id);
-                        return conversationRequests;
-                    }}
-                    fetchRequests={[]}
-                    pageSize={25}
-                    renderItem={(m: MessageData) => <Message message={m} />} />
-            </div>
+            <InfiniteScroller
+                getFetchRequests={async () => {
+                    const conversationRequests = await getConversationsRequests(this.props.location.state.id);
+                    return conversationRequests;
+                }}
+                fetchRequests={[]}
+                pageSize={25}
+                renderItem={(m: MessageData) => <Message message={m} />} />
         );
     }
 
     render() {
         return (
-            <div className="_3a_u">
+            <ContentContainer>
                 {this.renderTopBar()}
                 {this.renderBody()}
-            </div>
+            </ContentContainer>
         );
     }
 

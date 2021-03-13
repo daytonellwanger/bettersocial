@@ -2,6 +2,7 @@ import React from 'react';
 import driveClient from '../../DriveClient';
 import { Video } from '../../photos';
 import { decodeString, getTimeString } from '../../util';
+import ContentContainer from '../ContentContainer';
 import Image from '../util/Image';
 import InfiniteScroller from '../util/InfiniteScroller';
 
@@ -48,21 +49,19 @@ export default class Videos extends React.Component<{}, S> {
 
     renderBody() {
         return (
-            <div className="_4t5n" role="main">
-                <InfiniteScroller
-                        fetchRequests={[() => this.fetchVideos()]}
-                        pageSize={10}
-                        renderItem={(video: Video) => this.renderVideo(video)} />
-            </div>
+            <InfiniteScroller
+                    fetchRequests={[() => this.fetchVideos()]}
+                    pageSize={10}
+                    renderItem={(video: Video) => this.renderVideo(video)} />
         );
     }
 
     render() {
         return (
-            <div className="_3a_u">
+            <ContentContainer>
                 {this.renderTopBar()}
                 {this.renderBody()}
-            </div>
+            </ContentContainer>
         );
     }
 

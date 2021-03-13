@@ -4,6 +4,7 @@ import { AlbumIndexEntry } from '../../photos';
 import AlbumCover from './AlbumCover';
 import './Photos.css';
 import InfiniteScroller from '../util/InfiniteScroller';
+import ContentContainer from '../ContentContainer';
 
 export default class Photos extends React.Component {
 
@@ -33,12 +34,10 @@ export default class Photos extends React.Component {
 
     render() {
         return (
-            <div className="_3a_u">
+            <ContentContainer>
                 {this.renderTopBar()}
-                <div className="_4t5n" role="main">
-                    {this.renderAlbums()}
-                </div>
-            </div>
+                {this.renderAlbums()}
+            </ContentContainer>
         );
     }
 

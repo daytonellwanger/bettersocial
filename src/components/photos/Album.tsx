@@ -3,6 +3,7 @@ import { Album as AlbumData, Photo } from '../../photos';
 import Image from '../util/Image';
 import { getPhotoData, getTimeString } from '../../util';
 import InfiniteScroller from '../util/InfiniteScroller';
+import ContentContainer from '../ContentContainer';
 
 interface AlbumInfo {
     album?: AlbumData;
@@ -73,12 +74,10 @@ export default class Album extends React.Component<P, S> {
 
     render() {
         return (
-            <div className="_3a_u">
+            <ContentContainer>
                 {this.renderTopBar()}
-                <div className="_4t5n" role="main">
-                    {this.renderBody()}
-                </div>
-            </div>
+                {this.renderBody()}
+            </ContentContainer>
         );
     }
 

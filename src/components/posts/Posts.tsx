@@ -4,7 +4,8 @@ import { ExternalContextAttachmentData, MediaAttachmentData, Post, PostData, Pos
 import driveClient from '../../DriveClient';
 import Image from '../util/Image';
 import './Posts.css';
-import InfiniteScroller from '../util/InfiniteScroller';
+import InfiniteScroller from '../util/InfiniteScroller'
+import ContentContainer from '../ContentContainer';
 
 export default class Posts extends React.Component {
 
@@ -148,10 +149,10 @@ export default class Posts extends React.Component {
 
     render() {
         return (
-            <div>
+            <ContentContainer>
                 {this.renderPostsTopBar()}
                 {this.renderBody()}
-            </div>
+            </ContentContainer>
         );
     }
 

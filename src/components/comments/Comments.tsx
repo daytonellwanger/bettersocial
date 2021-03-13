@@ -3,6 +3,7 @@ import driveClient from '../../DriveClient';
 import { Comment } from '../../comments';
 import { decodeString, getTimeString } from '../../util';
 import InfiniteScroller from '../util/InfiniteScroller';
+import ContentContainer from '../ContentContainer';
 
 export default class CommentsComponent extends React.Component {
 
@@ -48,25 +49,23 @@ export default class CommentsComponent extends React.Component {
 
     renderBody() {
         return (
-            <div className="_4t5n" role="main">
-                <InfiniteScroller
-                    getFetchRequests={async () => {
-                        const comments = (await driveClient.getComments())!;
-                        return comments;
-                    }}
-                    fetchRequests={[]}
-                    pageSize={25}
-                    renderItem={(c: Comment) => this.renderComment(c)} />
-            </div>
+            <InfiniteScroller
+                getFetchRequests={async () => {
+                    const comments = (await driveClient.getComments())!;
+                    return comments;
+                }}
+                fetchRequests={[]}
+                pageSize={25}
+                renderItem={(c: Comment) => this.renderComment(c)} />
         );
     }
 
     render() {
         return (
-            <div className="_3a_u">
+            <ContentContainer>
                 {this.renderTopBar()}
                 {this.renderBody()}
-            </div>
+            </ContentContainer>
         );
     }
 

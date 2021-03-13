@@ -18,8 +18,7 @@ export default class Home extends React.Component {
                         </div>
                         <div className="_4rt8 _21op">
                             <div className="_4rt9">Posts</div>
-                            <div className="_4rtj">Posts you&#039;ve shared on Facebook, posts that are hidden
-                                            from your timeline and polls you have created</div>
+                            <div className="_4rtj">Posts you've shared on Facebook, posts that are hidden from your timeline and polls you have created</div>
                         </div>
                     </div>
                     <div className="_4rtp">

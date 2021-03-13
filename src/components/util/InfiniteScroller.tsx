@@ -50,7 +50,7 @@ export default class InfiniteScroller extends React.Component<P, S> {
         let items: any[];
         try {
             items = await fetchRequest();
-        } catch(error) {
+        } catch (error) {
             this.setState({ error });
             return [];
         }
@@ -102,7 +102,7 @@ export default class InfiniteScroller extends React.Component<P, S> {
                         </div>
                     ))}
                 </InfiniteScroll>
-            ); 
+            );
         }
     }
 

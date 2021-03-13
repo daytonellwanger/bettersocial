@@ -1,6 +1,7 @@
 import React from 'react';
 import driveClient from '../../DriveClient';
 import { ConversationFolder } from '../../messages';
+import ContentContainer from '../ContentContainer';
 import InfiniteScroller from '../util/InfiniteScroller';
 import ConversationTitle from './ConversationTitle';
 
@@ -22,24 +23,22 @@ export default class Messages extends React.Component {
 
     renderBody() {
         return (
-            <div className="_4t5n" role="main">
-                <InfiniteScroller
-                    fetchRequests={[async () => {
-                        const conversations = await driveClient.getConversationFolders();
-                        return conversations;
-                    }]}
-                    pageSize={25}
-                    renderItem={(cf: ConversationFolder) => <ConversationTitle conversationFolder={cf} />} />
-            </div>
+            <InfiniteScroller
+                fetchRequests={[async () => {
+                    const conversations = await driveClient.getConversationFolders();
+                    return conversations;
+                }]}
+                pageSize={25}
+                renderItem={(cf: ConversationFolder) => <ConversationTitle conversationFolder={cf} />} />
         );
     }
 
     render() {
         return (
-            <div className="_3a_u">
+            <ContentContainer>
                 {this.renderTopBar()}
                 {this.renderBody()}
-            </div>
+            </ContentContainer>
         );
     }
 
