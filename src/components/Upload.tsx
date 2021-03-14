@@ -1,7 +1,7 @@
 import React from 'react';
 import CSS from 'csstype';
 import JSZip from 'jszip';
-import driveClient from '../DriveClient';
+import { uploadFiles } from '../upload';
 import ProgressBar from './util/ProgressBar';
 
 interface P {
@@ -100,7 +100,7 @@ export default class Upload extends React.Component<P, S> {
     private async uploadFile(file: File) {
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zip = await JSZip.loadAsync(file!);
-        await driveClient.uploadFiles(zip, (progress, message) => this.setState({ progress, message }));
+        await uploadFiles(zip, (progress, message) => this.setState({ progress, message }));
         this.props.onUploadComplete();
     }
 
