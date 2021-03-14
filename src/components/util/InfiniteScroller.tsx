@@ -3,7 +3,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
 
 type Fetch = () => Promise<any[]>;
-interface P {
+export interface P {
     pageSize: number;
     fetchRequests: Fetch[];
     getFetchRequests?: () => Promise<Fetch[]>;

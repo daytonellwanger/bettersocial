@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface P {
+export interface P {
     color: string;
     image: string;
     title: string;
