@@ -6,20 +6,15 @@ import Image from '../util/Image';
 import './Posts.css';
 import InfiniteScroller from '../util/InfiniteScroller'
 import ContentContainer from '../ContentContainer';
+import TitleBar from '../util/TitleBar';
 
 export default class Posts extends React.Component {
 
     renderPostsTopBar() {
-        return (
-            <div className="_3-8y _3-95 _3b0b">
-                <div style={{ backgroundColor: '#8C72CB' }} className="_3z-t"><img
-                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEX///9MaXH///////////////////////////////////////+2I0voAAAAC3RSTlOAAHTdqgOD4wItpp12MDIAAABDSURBVAhbYxCEAgY4o8l6NxBs1mDQ3g0GmxisyxiAIH0zw25XkIqQ3Qy7oYBhN0RqNw4pLhDDGiglCTQRYSDcCgzbAVkOMGvtylXuAAAAAElFTkSuQmCC" />
-                </div>
-                <div className="_3b0c">
-                    <div className="_3b0d">Your Posts</div>
-                </div>
-            </div>
-        );
+        return <TitleBar
+                    color="#8C72CB"
+                    image="iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEX///9MaXH///////////////////////////////////////+2I0voAAAAC3RSTlOAAHTdqgOD4wItpp12MDIAAABDSURBVAhbYxCEAgY4o8l6NxBs1mDQ3g0GmxisyxiAIH0zw25XkIqQ3Qy7oYBhN0RqNw4pLhDDGiglCTQRYSDcCgzbAVkOMGvtylXuAAAAAElFTkSuQmCC"
+                    title="Your Posts" />;
     }
 
     renderPost(post: Post | PostWithAttachment) {
