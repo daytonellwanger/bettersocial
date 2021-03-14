@@ -1,7 +1,7 @@
 import { PostWithAttachment } from './contracts/posts';
 import { AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './contracts/photos';
 import { Comment } from './contracts/comments';
-import { ConversationFolder, ConversationIndex } from './contracts/messages';
+import { Conversation, ConversationFolder, ConversationIndex, Message } from './contracts/messages';
 import { requestQueue } from './requests';
 
 export const mainFolderName = 'facebook-data';
@@ -200,6 +200,22 @@ export async function getFileData(uri: string): Promise<FileData | undefined> {
         webViewLink: fileInfo.webViewLink!,
         iconLink: fileInfo.iconLink!
     };
+}
+
+export async function getConversationsRequests(folderId: string): Promise<(() => Promise<Message[]>)[]> {
+    const conversationPages = (await gapi.client.drive.files.list({ q: `"${folderId}" in parents and name contains 'message_'` })).result.files!;
+    if (!conversationPages || conversationPages.length === 0) {
+        throw new Error('Could not find conversation file');
+    }
+
+    const conversationsRequests = conversationPages.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
+        return async () => {
+            const conversation = (await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as Conversation;
+            return conversation.messages;
+        }
+    });
+
+    return conversationsRequests;
 }
 
 const driveClient = new DriveClient();

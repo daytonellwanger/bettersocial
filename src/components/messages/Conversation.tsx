@@ -1,5 +1,6 @@
 import React from 'react';
-import { Conversation as ConversationData, Message as MessageData } from '../../contracts/messages';
+import { Message as MessageData } from '../../contracts/messages';
+import { getConversationsRequests } from '../../DriveClient';
 import { P as InfiniteScrollerProps } from '../util/InfiniteScroller';
 import { P as TitleBarProps } from '../util/TitleBar';
 import Message from './Message';
@@ -31,20 +32,4 @@ export default class Conversation extends React.Component<P> {
         return <Page titleBar={titleBar} data={data} />;
     }
 
-}
-
-async function getConversationsRequests(folderId: string): Promise<(() => Promise<MessageData[]>)[]> {
-    const conversationPages = (await gapi.client.drive.files.list({ q: `"${folderId}" in parents and name contains 'message_'` })).result.files!;
-    if (!conversationPages || conversationPages.length === 0) {
-        throw new Error('Could not find conversation file');
-    }
-
-    const conversationsRequests = conversationPages.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
-        return async () => {
-            const conversation = (await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as ConversationData;
-            return conversation.messages;
-        }
-    });
-
-    return conversationsRequests;
 }
