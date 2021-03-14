@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileData, getFileData } from '../../util';
+import { FileData, getFileData } from '../../DriveClient';
 
 interface P {
     uri: string;

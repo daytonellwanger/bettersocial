@@ -1,6 +1,6 @@
 import React from 'react';
 import { Album as AlbumData, Photo as PhotoData } from '../../contracts/photos';
-import { getPhotoData } from '../../util';
+import { getPhotoData } from '../../DriveClient';
 import { P as InfiniteScrollerProps } from '../util/InfiniteScroller';
 import { P as TitleBarProps } from '../util/TitleBar';
 import Page from '../Page';

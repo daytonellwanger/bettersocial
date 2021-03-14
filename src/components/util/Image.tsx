@@ -1,5 +1,5 @@
 import React from 'react';
-import { getPhotoData, PhotoData } from '../../util';
+import { getPhotoData, PhotoData } from '../../DriveClient';
 import './Image.css';
 
 interface P {
