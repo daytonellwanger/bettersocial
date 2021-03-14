@@ -1,6 +1,6 @@
 import React from 'react';
 import driveClient from '../../DriveClient';
-import { Video as VideoData } from '../../photos';
+import { Video as VideoData } from '../../contracts/photos';
 import { P as InfiniteScrollerProps } from '../util/InfiniteScroller';
 import { P as TitleBarProps } from '../util/TitleBar';
 import Page from '../Page';

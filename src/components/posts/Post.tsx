@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalContextAttachmentData, MediaAttachmentData, Post as PostObject, PostData, PostWithAttachment } from '../../posts';
+import { ExternalContextAttachmentData, MediaAttachmentData, Post as PostObject, PostData, PostWithAttachment } from '../../contracts/posts';
 import { decodeString, getTimeString } from '../../util';
 import Image from '../util/Image';
 

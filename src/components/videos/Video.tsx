@@ -1,5 +1,5 @@
 import React from 'react';
-import { Video as VideoData } from '../../photos';
+import { Video as VideoData } from '../../contracts/photos';
 import { decodeString, getTimeString } from '../../util';
 import Image from '../util/Image';
 

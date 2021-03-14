@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ConversationFolder } from '../../messages';
+import { ConversationFolder } from '../../contracts/messages';
 
 export default function ConversationTitle(conversationFolder: ConversationFolder) {
     return (

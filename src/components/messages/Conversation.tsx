@@ -1,5 +1,5 @@
 import React from 'react';
-import { Conversation as ConversationData, Message as MessageData } from '../../messages';
+import { Conversation as ConversationData, Message as MessageData } from '../../contracts/messages';
 import { P as InfiniteScrollerProps } from '../util/InfiniteScroller';
 import { P as TitleBarProps } from '../util/TitleBar';
 import Message from './Message';

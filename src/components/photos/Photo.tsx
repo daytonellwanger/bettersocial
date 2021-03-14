@@ -1,5 +1,5 @@
 import React from 'react';
-import { Photo as PhotoData } from '../../photos';
+import { Photo as PhotoData } from '../../contracts/photos';
 import { getTimeString } from '../../util';
 import Image from '../util/Image';
 

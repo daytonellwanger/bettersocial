@@ -1,5 +1,5 @@
 import React from 'react';
-import { Comment as CommentData } from '../../comments';
+import { Comment as CommentData } from '../../contracts/comments';
 import { decodeString, getTimeString } from '../../util';
 
 export default function Comment(comment: CommentData) {

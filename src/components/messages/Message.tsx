@@ -1,5 +1,5 @@
 import React from 'react';
-import { Message as MessageData } from '../../messages';
+import { Message as MessageData } from '../../contracts/messages';
 import { decodeString, getTimeString } from '../../util';
 import Image from '../util/Image';
 import File from '../util/File';

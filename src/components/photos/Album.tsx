@@ -1,5 +1,5 @@
 import React from 'react';
-import { Album as AlbumData, Photo as PhotoData } from '../../photos';
+import { Album as AlbumData, Photo as PhotoData } from '../../contracts/photos';
 import { getPhotoData } from '../../util';
 import { P as InfiniteScrollerProps } from '../util/InfiniteScroller';
 import { P as TitleBarProps } from '../util/TitleBar';

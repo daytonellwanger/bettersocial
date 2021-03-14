@@ -1,11 +1,11 @@
 import React from 'react';
-import { Post as PostObject, PostWithAttachment } from '../posts';
+import { Post as PostObject, PostWithAttachment } from '../contracts/posts';
 import Post from './posts/Post';
-import { AlbumIndexEntry } from '../photos';
+import { AlbumIndexEntry } from '../contracts/photos';
 import AlbumCover from './photos/AlbumCover';
-import { Comment as CommentData } from '../comments';
+import { Comment as CommentData } from '../contracts/comments';
 import Comment from './comments/Comment';
-import { ConversationFolder } from '../messages';
+import { ConversationFolder } from '../contracts/messages';
 import ConversationTitle from './messages/ConversationTitle';
 import { P as InfiniteScrollerProps } from './util/InfiniteScroller';
 import { P as TitleBarProps } from './util/TitleBar';

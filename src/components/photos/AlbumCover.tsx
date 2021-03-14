@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AlbumIndexEntry } from '../../photos';
+import { AlbumIndexEntry } from '../../contracts/photos';
 import { getTimeString } from '../../util';
 import Image from '../util/Image';
 

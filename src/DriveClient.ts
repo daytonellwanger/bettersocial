@@ -1,9 +1,9 @@
 import JSZip from 'jszip';
 import { requestQueue } from './util';
-import { PostWithAttachment } from './posts';
-import { Album, AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './photos';
-import { Comment } from './comments';
-import { Conversation, ConversationFolder, ConversationIndex } from './messages';
+import { PostWithAttachment } from './contracts/posts';
+import { Album, AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './contracts/photos';
+import { Comment } from './contracts/comments';
+import { Conversation, ConversationFolder, ConversationIndex } from './contracts/messages';
 
 const mainFolderName = 'facebook-data';
 
