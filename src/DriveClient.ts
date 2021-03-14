@@ -1,8 +1,8 @@
-import { requestQueue } from './requests';
 import { PostWithAttachment } from './contracts/posts';
 import { AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './contracts/photos';
 import { Comment } from './contracts/comments';
 import { ConversationFolder, ConversationIndex } from './contracts/messages';
+import { requestQueue } from './requests';
 
 export const mainFolderName = 'facebook-data';
 
@@ -40,23 +40,46 @@ class DriveClient {
         return this.initPromise;
     }
 
-    public async getPosts() {
+    private async getFilesFromRootFolder(folderName: string, fileName: string, exactFileName = false) {
         await this.init();
 
-        const postsFolder = this.root!.find(f => f.name === 'posts');
-        if (!postsFolder) {
-            throw new Error('Could not find posts folder');
+        const folder = this.root!.find(f => f.name === folderName);
+        if (!folder) {
+            throw new Error(`Could not find folder ${folderName}`);
         }
-        if (!postsFolder.id) {
-            throw new Error('Posts folder has no ID');
-        }
-        const postsFolderId = postsFolder.id;
-
-        const postsFiles = (await gapi.client.drive.files.list({ q: `"${postsFolderId}" in parents and name contains 'your_posts'` })).result.files!;
-        if (!postsFiles || postsFiles.length === 0) {
-            throw new Error('Posts folder has no children');
+        if (!folder.id) {
+            throw new Error(`${folderName} has no ID`);
         }
 
+        const fileNameQuery = exactFileName 
+                                ? `name="${fileName}"`
+                                : `name contains "${fileName}"`;
+        const files = (await gapi.client.drive.files.list({ q: `"${folder.id}" in parents and ${fileNameQuery}` })).result.files!;
+        if (!files || files.length === 0) {
+            throw new Error(`Could not find file ${fileName}`);
+        }
+
+        return files;
+    }
+
+    private async getRootFile(name: string) {
+        await this.init();
+
+        const file = this.root!.find(f => f.name === name)!;
+        if (!file) {
+            throw new Error(`Could not find file ${name}`);
+        }
+
+        const fileContents = (await gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' })).result!;
+        if (!fileContents) {
+            throw new Error(`Could not read file ${name}`);
+        }
+
+        return fileContents;
+    }
+
+    public async getPosts() {
+        const postsFiles = await this.getFilesFromRootFolder('posts', 'your_posts');
         return postsFiles.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
             return async () => {
                 const posts = (await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as PostWithAttachment[];
@@ -65,39 +88,18 @@ class DriveClient {
         });
     }
 
-    public async getAlbumFiles(): Promise<AlbumIndexEntry[]> {
-        await this.init();
-
-        const albumIndexFile = this.root!.find(f => f.name === 'albumIndex.json')!;
-        if (!albumIndexFile) {
-            throw new Error('Could not find album index');
-        }
-
-        const albumIndex = (await gapi.client.drive.files.get({ fileId: albumIndexFile.id!, alt: 'media' })).result! as AlbumIndex;
-        if (!albumIndex) {
-            throw new Error('Could not read album index');
-        }
-
-        albumIndex.albums.sort((a, b) => b.timestamp - a.timestamp);
-        return albumIndex.albums;
+    public async getComments() {
+        const commentsFiles = await this.getFilesFromRootFolder('comments', 'comments');
+        return commentsFiles.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
+            return async () => {
+                const comments = ((await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as any).comments as Comment[];
+                return comments;
+            }
+        });
     }
 
     public async getVideos(): Promise<VideosInfo> {
-        await this.init();
-
-        const photosAndVideosFolder = this.root!.find(f => f.name === 'photos_and_videos');
-        if (!photosAndVideosFolder) {
-            throw new Error('Could not find photos folder');
-        }
-        if (!photosAndVideosFolder.id) {
-            throw new Error('Photos folder has no ID');
-        }
-        const photosAndVideosFolderId = photosAndVideosFolder.id;
-
-        const videosFiles = (await gapi.client.drive.files.list({ q: `"${photosAndVideosFolderId}" in parents and name="your_videos.json"` })).result.files!;
-        if (!videosFiles || videosFiles.length === 0) {
-            throw new Error('Could not find videos file');
-        }
+        const videosFiles = await this.getFilesFromRootFolder('photos_and_videos', 'your_videos.json', true);
         if (videosFiles.length > 1) {
             throw new Error('Found multiple videos files');
         }
@@ -106,6 +108,7 @@ class DriveClient {
             throw new Error('Videos file has no ID');
         }
 
+        const photosAndVideosFolderId = this.root!.find(f => f.name === 'photos_and_videos')!.id!;
         let videosFolderLink: string | undefined;
         const videosFolder = (await gapi.client.drive.files.list({ q: `mimeType = 'application/vnd.google-apps.folder' and "${photosAndVideosFolderId}" in parents and name="videos"` })).result.files!;
         if (videosFolder && videosFolder.length === 1 && videosFolder[0].id) {
@@ -119,44 +122,14 @@ class DriveClient {
         };
     }
 
-    public async getComments() {
-        await this.init();
-
-        const commentsFolder = this.root!.find(f => f.name === 'comments');
-        if (!commentsFolder) {
-            throw new Error('Could not find comments folder');
-        }
-        if (!commentsFolder.id) {
-            throw new Error('Comments folder has no ID');
-        }
-        const commentsFolderId = commentsFolder.id;
-
-        const commentsFiles = (await gapi.client.drive.files.list({ q: `"${commentsFolderId}" in parents and name contains "comments"` })).result.files!;
-        if (!commentsFiles || commentsFiles.length === 0) {
-            throw new Error('Could not find comments file');
-        }
-
-        return commentsFiles.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
-            return async () => {
-                const comments = ((await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as any).comments as Comment[];
-                return comments;
-            }
-        });
+    public async getAlbumFiles(): Promise<AlbumIndexEntry[]> {
+        const albumIndex = (await this.getRootFile('albumIndex.json')) as AlbumIndex;
+        albumIndex.albums.sort((a, b) => b.timestamp - a.timestamp);
+        return albumIndex.albums;
     }
 
     public async getConversationFolders(): Promise<ConversationFolder[]> {
-        await this.init();
-
-        const conversationIndexFile = this.root!.find(f => f.name === 'conversationIndex.json')!;
-        if (!conversationIndexFile) {
-            throw new Error('Could not find conversation index');
-        }
-
-        const conversationIndex = (await gapi.client.drive.files.get({ fileId: conversationIndexFile.id!, alt: 'media' })).result as ConversationIndex;
-        if (!conversationIndex) {
-            throw new Error('Could not read conversation index');
-        }
-
+        const conversationIndex = (await this.getRootFile('conversationIndex.json')) as ConversationIndex;
         return conversationIndex.conversations.map(c => (
             {
                 name: c.title,
