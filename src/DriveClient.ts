@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import { requestQueue } from './util';
+import { requestQueue } from './requests';
 import { PostWithAttachment } from './contracts/posts';
 import { Album, AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './contracts/photos';
 import { Comment } from './contracts/comments';
