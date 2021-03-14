@@ -28,7 +28,7 @@ export default class Conversation extends React.Component<P> {
             pageSize: 25,
             renderItem: (m: MessageData) => <Message { ...m } />
         };
-        return <Page titleBar={titleBar} infiniteScroller={data} />;
+        return <Page titleBar={titleBar} data={data} />;
     }
 
 }

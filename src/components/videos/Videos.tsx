@@ -33,7 +33,7 @@ export default class Videos extends React.Component<{}, S> {
             pageSize: 10,
             renderItem: (video: VideoData) => <Video { ...video } />
         };
-        return <Page titleBar={titleBar} infiniteScroller={data} />;
+        return <Page titleBar={titleBar} data={data} />;
     }
 
 }

@@ -534,7 +534,8 @@ html ._5vb_._5vb_.hasLeftCol .hasRightCol div#contentArea {
 
 ._3a_u {
     margin: 0 auto;
-    width: 598px
+    width: 100%;
+    max-width: 598px
 }
 
 ._4t5n {

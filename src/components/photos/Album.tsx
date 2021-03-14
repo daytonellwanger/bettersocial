@@ -42,7 +42,7 @@ export default class Album extends React.Component<P, S> {
             pageSize: 10,
             renderItem: (p: PhotoData) => <Photo { ...p } />
         };
-        return <Page titleBar={titleBar} infiniteScroller={data} />;
+        return <Page titleBar={titleBar} data={data} />;
     }
 
 }

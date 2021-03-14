@@ -1,22 +1,14 @@
 import React from 'react';
-import TitleBar, { P as TitleBarProps } from './util/TitleBar';
-import InfiniteScroller, { P as InfiniteScrollerProps } from './util/InfiniteScroller';
+import { Page as P } from './Pages';
+import TitleBar from './util/TitleBar';
+import InfiniteScroller from './util/InfiniteScroller';
 import ContentContainer from './ContentContainer';
 
-interface P {
-    titleBar: TitleBarProps;
-    infiniteScroller: InfiniteScrollerProps;
-}
-
-export default class Page extends React.Component<P> {
-
-    render() {
-        return (
-            <ContentContainer>
-                <TitleBar { ...this.props.titleBar } />
-                <InfiniteScroller { ...this.props.infiniteScroller } />
-            </ContentContainer>
-        );
-    }
-
+export default function Page(page: P) {
+    return (
+        <ContentContainer>
+            <TitleBar {...page.titleBar} />
+            <InfiniteScroller {...page.data} />
+        </ContentContainer>
+    );
 }
