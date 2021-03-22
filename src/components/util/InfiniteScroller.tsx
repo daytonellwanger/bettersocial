@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
 
@@ -15,42 +15,43 @@ export interface P {
 
 export default function InfiniteScroller(props: P) {
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [fetchRequestsIdx, setFetchRequestsIdx] = useState<number>(0);
-    const [fetchedItems, setFetchedItems] = useState<any[]>([]);
-    const [loadedItems, setLoadedItems] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any | undefined>();
-    const [gotFetchRequests, setGotFetchRequests] = useState<Fetch[]>([]);
+    let [loadedItems, setLoadedItems] = useState<any[]>([]);
 
-    const fetchRequests = props.fetchRequests || gotFetchRequests;
+    const fetchRequestsIdx = useRef<number>(0);
+    const fetchedItems = useRef<any[]>([]);
+    const fetchRequests = useRef<Fetch[] | undefined>(props.fetchRequests);
 
     const id = props.id || '';
     useEffect(() => {
-        async function fetch() {
-            setFetchRequestsIdx(0);
-            setFetchedItems([]);
-            setLoadedItems([]);
+        async function reset() {
+            setLoading(true);
             setError(undefined);
-            setGotFetchRequests([]);
+            // eslint-disable-next-line
+            loadedItems = [];
+            setLoadedItems([]);
+            fetchRequestsIdx.current = 0;
+            fetchedItems.current = [];
             if (props.getFetchRequests) {
-                setLoading(true);
                 try {
-                    const gotFetchRequests = await props.getFetchRequests!();
-                    setGotFetchRequests(gotFetchRequests);
+                    fetchRequests.current = await props.getFetchRequests!();
                 } catch (error) {
                     setError(error);
                 }
-                setLoading(false);
             }
+            await fetchNext();
+            setLoading(false);
         }
-        fetch();
+        reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, props.getFetchRequests]);
 
     async function fetchNext() {
-        if (fetchRequestsIdx >= fetchRequests.length) {
+        if (fetchRequestsIdx.current >= fetchRequests.current!.length) {
             return;
         }
-        const fetchRequest = fetchRequests[fetchRequestsIdx];
+        const fetchRequest = fetchRequests.current![fetchRequestsIdx.current];
         let items: any[];
         try {
             items = await fetchRequest();
@@ -58,20 +59,19 @@ export default function InfiniteScroller(props: P) {
             setError(error);
             return [];
         }
-        setFetchRequestsIdx(fetchRequestsIdx + 1);
-        setFetchedItems(fetchedItems.concat(items));
+        fetchRequestsIdx.current = fetchRequestsIdx.current + 1;
+        fetchedItems.current = fetchedItems.current.concat(items);
         setLoadedItems(loadedItems.concat(items.slice(0, Math.min(props.pageSize, items.length))));
     }
 
     async function nextPage() {
-        if (fetchedItems.length > loadedItems.length) {
-            const _loadedItems = loadedItems.concat(
-                fetchedItems.slice(
+        if (fetchedItems.current.length > loadedItems.length) {
+            setLoadedItems(loadedItems.concat(
+                fetchedItems.current.slice(
                     loadedItems.length,
-                    Math.min(loadedItems.length + props.pageSize, fetchedItems.length)
+                    Math.min(loadedItems.length + props.pageSize, fetchedItems.current.length)
                 )
-            );
-            setLoadedItems(_loadedItems);
+            ));
         } else {
             await fetchNext();
         }
@@ -89,24 +89,20 @@ export default function InfiniteScroller(props: P) {
         }
     }
 
-    if (fetchedItems.length === 0 && fetchRequests.length > 0) {
-        fetchNext();
-    }
-
-    if (loading) {
+    if (error) {
+        return <p>{error.toString()}</p>
+    } else if (loading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
                 <PulseLoader color="#7086ff" size={10} />
             </div>
         );
-    } else if (error) {
-        return <p>{error.toString()}</p>
     } else {
         return (
             <InfiniteScroll
                 dataLength={loadedItems.length}
                 next={() => nextPage()}
-                hasMore={fetchedItems.length > loadedItems.length || fetchRequestsIdx < fetchRequests.length}
+                hasMore={fetchedItems.current.length > loadedItems.length || fetchRequestsIdx.current < fetchRequests.current!.length}
                 loader={
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
                         <PulseLoader color="#7086ff" size={10} />
