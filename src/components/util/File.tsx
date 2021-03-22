@@ -23,7 +23,7 @@ export default class File extends React.Component<P, FileData> {
     render() {
         return (
             <a href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
-                <img referrerPolicy="no-referrer" src={this.state.iconLink} />
+                <img referrerPolicy="no-referrer" src={this.state.iconLink} alt={this.state.name} />
                 {this.state.name}
             </a>
         );

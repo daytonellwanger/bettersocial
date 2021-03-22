@@ -1,4 +1,5 @@
 import React from 'react';
+import { CardMedia, Link } from '@material-ui/core';
 import { getPhotoData, PhotoData } from '../../DriveClient';
 import './Image.css';
 
@@ -25,23 +26,23 @@ export default class Image extends React.Component<P, PhotoData> {
     render() {
         if (this.state.webViewLink && !this.state.content) {
             return (
-                <a href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
-                    <div className='video-thumbnail'>
-                        <img referrerPolicy="no-referrer" src={this.state.thumbnailLink} className="_2yuc _3-96" />
-                    </div>
-                </a>
+                <Link href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
+                    <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={this.state.thumbnailLink} />
+                </Link>
             );
         } else {
             if (this.props.link) {
                 return (
-                    <a href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
-                        <img src={`data:image/jpeg;base64,${btoa(this.state.content)}`} className="_2yuc _3-96" />
-                    </a>
+                    <Link href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
+                        <CardMedia
+                            style={{ height: 0, paddingTop: '56.25%' }}
+                            image={`data:image/jpeg;base64,${btoa(this.state.content)}`} />
+                    </Link>
                 );
             } else {
-                return (
-                    <img src={`data:image/jpeg;base64,${btoa(this.state.content)}`} className="_2yuc _3-96" />
-                );
+                return <CardMedia
+                    style={{ height: 0, paddingTop: '56.25%' }}
+                    image={`data:image/jpeg;base64,${btoa(this.state.content)}`} />;
             }
         }
     }

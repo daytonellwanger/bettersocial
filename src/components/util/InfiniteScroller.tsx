@@ -1,109 +1,116 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
 
-type Fetch = () => Promise<any[]>;
+export type Fetch = () => Promise<any[]>;
 export interface P {
     pageSize: number;
-    fetchRequests: Fetch[];
+    id?: string;
+    fetchRequests?: Fetch[];
     getFetchRequests?: () => Promise<Fetch[]>;
-    renderItem: (item: any) => JSX.Element;
+    renderItem?: (item: any) => JSX.Element;
+    renderItems?: (items: any[]) => JSX.Element;
+    scrollableTarget?: React.ReactNode;
 }
 
-interface S {
-    loading: boolean;
-    fetchRequestsIdx: number;
-    fetchedItems: any[];
-    loadedItems: any[];
-    error?: any;
-}
+export default function InfiniteScroller(props: P) {
 
-export default class InfiniteScroller extends React.Component<P, S> {
+    const [loading, setLoading] = useState<boolean>(false);
+    const [fetchRequestsIdx, setFetchRequestsIdx] = useState<number>(0);
+    const [fetchedItems, setFetchedItems] = useState<any[]>([]);
+    const [loadedItems, setLoadedItems] = useState<any[]>([]);
+    const [error, setError] = useState<any | undefined>();
+    const [gotFetchRequests, setGotFetchRequests] = useState<Fetch[]>([]);
 
-    fetchRequests = this.props.fetchRequests;
+    const fetchRequests = props.fetchRequests || gotFetchRequests;
 
-    state: S = {
-        loading: false,
-        fetchRequestsIdx: 0,
-        fetchedItems: [],
-        loadedItems: []
-    };
-
-    async componentDidMount() {
-        if (this.props.getFetchRequests) {
-            this.setState({ loading: true });
-            try {
-                this.fetchRequests = await this.props.getFetchRequests();
-            } catch (error) {
-                this.setState({ error });
+    const id = props.id || '';
+    useEffect(() => {
+        async function fetch() {
+            setFetchRequestsIdx(0);
+            setFetchedItems([]);
+            setLoadedItems([]);
+            setError(undefined);
+            setGotFetchRequests([]);
+            if (props.getFetchRequests) {
+                setLoading(true);
+                try {
+                    const gotFetchRequests = await props.getFetchRequests!();
+                    setGotFetchRequests(gotFetchRequests);
+                } catch (error) {
+                    setError(error);
+                }
+                setLoading(false);
             }
-            this.setState({ loading: false });
         }
-        await this.fetchNext();
-    }
+        fetch();
+    }, [id, props.getFetchRequests]);
 
-    async fetchNext() {
-        if (this.state.fetchRequestsIdx >= this.fetchRequests.length) {
+    async function fetchNext() {
+        if (fetchRequestsIdx >= fetchRequests.length) {
             return;
         }
-        const fetchRequest = this.fetchRequests[this.state.fetchRequestsIdx];
+        const fetchRequest = fetchRequests[fetchRequestsIdx];
         let items: any[];
         try {
             items = await fetchRequest();
         } catch (error) {
-            this.setState({ error });
+            setError(error);
             return [];
         }
-        this.setState({
-            ...this.state,
-            fetchRequestsIdx: this.state.fetchRequestsIdx + 1,
-            fetchedItems: this.state.fetchedItems.concat(items),
-            loadedItems: this.state.loadedItems.concat(items.slice(0, Math.min(this.props.pageSize, items.length)))
-        });
+        setFetchRequestsIdx(fetchRequestsIdx + 1);
+        setFetchedItems(fetchedItems.concat(items));
+        setLoadedItems(loadedItems.concat(items.slice(0, Math.min(props.pageSize, items.length))));
     }
 
-    async nextPage() {
-        if (this.state.fetchedItems.length > this.state.loadedItems.length) {
-            const loadedItems = this.state.loadedItems.concat(
-                this.state.fetchedItems.slice(
-                    this.state.loadedItems.length,
-                    Math.min(this.state.loadedItems.length + this.props.pageSize, this.state.fetchedItems.length)
+    async function nextPage() {
+        if (fetchedItems.length > loadedItems.length) {
+            const _loadedItems = loadedItems.concat(
+                fetchedItems.slice(
+                    loadedItems.length,
+                    Math.min(loadedItems.length + props.pageSize, fetchedItems.length)
                 )
             );
-            this.setState({ ...this.state, loadedItems });
+            setLoadedItems(_loadedItems);
         } else {
-            await this.fetchNext();
+            await fetchNext();
         }
     }
 
-    render() {
-        if (this.state.loading) {
-            return (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                    <PulseLoader color="#7086ff" size={10} />
-                </div>
-            );
-        } else if (this.state.error) {
-            return <p>{this.state.error.toString()}</p>
-        } else {
-            return (
-                <InfiniteScroll
-                    dataLength={this.state.loadedItems.length}
-                    next={() => this.nextPage()}
-                    hasMore={this.state.fetchedItems.length > this.state.loadedItems.length || this.state.fetchRequestsIdx < this.fetchRequests.length}
-                    loader={
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                            <PulseLoader color="#7086ff" size={10} />
-                        </div>
-                    }>
-                    {this.state.loadedItems.map((i, idx) => (
-                        <div key={idx}>
-                            {this.props.renderItem(i)}
-                        </div>
-                    ))}
-                </InfiniteScroll>
-            );
+    function renderItems() {
+        if (props.renderItems) {
+            return props.renderItems!(loadedItems);
+        } else if (props.renderItem) {
+            return loadedItems.map(i => props.renderItem!(i));
         }
     }
 
+    if (fetchedItems.length === 0 && fetchRequests.length > 0) {
+        fetchNext();
+    }
+
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
+                <PulseLoader color="#7086ff" size={10} />
+            </div>
+        );
+    } else if (error) {
+        return <p>{error.toString()}</p>
+    } else {
+        return (
+            <InfiniteScroll
+                dataLength={loadedItems.length}
+                next={() => nextPage()}
+                hasMore={fetchedItems.length > loadedItems.length || fetchRequestsIdx < fetchRequests.length}
+                loader={
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
+                        <PulseLoader color="#7086ff" size={10} />
+                    </div>
+                }
+                scrollableTarget={props.scrollableTarget}>
+                {renderItems()}
+            </InfiniteScroll>
+        );
+    }
 }
