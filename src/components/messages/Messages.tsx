@@ -29,7 +29,7 @@ export default function Messages() {
         const conversation = conversations[index];
         return (
             <ListItem button divider key={index} style={style} onClick={() => setSelectedConversation(conversation)}>
-                <Typography noWrap variant="body2" color="initial">{decodeString(conversation.name)}</Typography>
+                <Typography noWrap variant="button" color="secondary">{decodeString(conversation.name)}</Typography>
             </ListItem>
         );
     }

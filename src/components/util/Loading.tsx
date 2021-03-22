@@ -1,14 +1,12 @@
 import React from 'react';
+import { useTheme } from '@material-ui/core';
 import RingLoader from 'react-spinners/RingLoader';
 
-export default class Loading extends React.Component {
-
-    render() {
+export default function Loading() {
+        const theme = useTheme();
         return (
             <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '8em' }}>
-                <RingLoader color="#7086ff" size={50} />
+                <RingLoader color={theme.palette.secondary.main} size={50} />
             </div>
         );
-    }
-
 }

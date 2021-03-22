@@ -1,31 +1,45 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 import APIClient from '../APIClient';
 import Router from './Router';
 import SignIn from './SignIn';
 import Loading from './util/Loading';
 
-interface S {
-    isSignedIn?: boolean;
-}
+export default function Main() {
 
-export default class Main extends React.Component<{}, S> {
+    const [isSignedIn, setSignedIn] = useState<boolean | undefined>();
+    const client = useRef(new APIClient((isSignedIn: boolean) => setSignedIn(isSignedIn)));
+    useEffect(() => client.current.init(), []);
 
-    private client = new APIClient((isSignedIn: boolean) => this.setState({ isSignedIn }));
-    
-    state: S = {};
-
-    componentDidMount() {
-        this.client.init();
-    }
-
-    render() {
-        if (typeof this.state.isSignedIn === 'undefined') {
+    function render() {
+        if (typeof isSignedIn === 'undefined') {
             return <Loading />;
         } else {
-            return this.state.isSignedIn
-                ? <Router signOut={() => this.client.signOut()} />
-                : <SignIn signIn={this.client.signIn} />;
+            return isSignedIn
+                ? <Router signOut={() => client.current.signOut()} />
+                : <SignIn signIn={client.current.signIn} />;
         }
     }
 
+    return <ThemeProvider theme={theme}>{render()}</ThemeProvider>;
 }
+
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+            main: '#fafafa',
+            contrastText: '#263238'
+        },
+        secondary: {
+            main: '#37474f',
+            contrastText: '#eceff1'
+        }
+    },
+    typography: {
+        fontFamily: [
+            '"Helvetica Neue"',
+            'Arial',
+            'sans-serif'
+        ].join(','),
+    }
+});

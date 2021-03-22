@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTheme } from '@material-ui/core';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PulseLoader from 'react-spinners/PulseLoader';
 
@@ -15,6 +16,8 @@ export interface P {
 }
 
 export default function InfiniteScroller(props: P) {
+
+    const theme = useTheme();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any | undefined>();
@@ -95,7 +98,7 @@ export default function InfiniteScroller(props: P) {
     } else if (loading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                <PulseLoader color="#7086ff" size={10} />
+                <PulseLoader color={theme.palette.secondary.main} size={10} />
             </div>
         );
     } else {
@@ -108,7 +111,7 @@ export default function InfiniteScroller(props: P) {
                 hasMore={fetchedItems.current.length > loadedItems.length || fetchRequestsIdx.current < fetchRequests.current!.length}
                 loader={
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-                        <PulseLoader color="#7086ff" size={10} />
+                        <PulseLoader color={theme.palette.secondary.main} size={10} />
                     </div>
                 }
                 scrollableTarget={props.scrollableTarget}>
