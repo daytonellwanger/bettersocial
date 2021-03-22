@@ -1,5 +1,5 @@
 import React from 'react';
-import { Message as MessageData } from '../../contracts/messages';
+import { MessagePlus } from '../../contracts/messages';
 import { getConversationsRequests } from '../../DriveClient';
 import Message from './Message';
 import InfiniteScroller from '../util/InfiniteScroller';
@@ -17,7 +17,7 @@ export default function Conversation(props: P) {
             inverse={true}
             pageSize={25}
             getFetchRequests={() => getConversationsRequests(props.id)}
-            renderItem={(message: MessageData) => <Message key={message.timestamp_ms} { ...message } />}
+            renderItem={(message: MessagePlus) => <Message key={message.timestamp_ms} { ...message } />}
             scrollableTarget={props.scrollableTarget} />
     );
 

@@ -1,7 +1,7 @@
 import { PostWithAttachment } from './contracts/posts';
 import { AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './contracts/photos';
 import { Comment } from './contracts/comments';
-import { Conversation, ConversationFolder, ConversationIndex, Message } from './contracts/messages';
+import { Conversation, ConversationFolder, ConversationIndex, MessagePlus } from './contracts/messages';
 import { requestQueue } from './requests';
 
 export const mainFolderName = 'facebook-data';
@@ -202,7 +202,7 @@ export async function getFileData(uri: string): Promise<FileData | undefined> {
     };
 }
 
-export async function getConversationsRequests(folderId: string): Promise<(() => Promise<Message[]>)[]> {
+export async function getConversationsRequests(folderId: string): Promise<(() => Promise<MessagePlus[]>)[]> {
     const conversationPages = (await gapi.client.drive.files.list({ q: `"${folderId}" in parents and name contains 'message_'` })).result.files!;
     if (!conversationPages || conversationPages.length === 0) {
         throw new Error('Could not find conversation file');
@@ -211,7 +211,16 @@ export async function getConversationsRequests(folderId: string): Promise<(() =>
     const conversationsRequests = conversationPages.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
         return async () => {
             const conversation = (await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as Conversation;
-            return conversation.messages;
+            let myName = '';
+            if (conversation.participants.length <= 3) {
+                for (let participant of conversation.participants) {
+                    if (conversation.title.indexOf(participant.name) < 0) {
+                        myName = participant.name;
+                        break;
+                    }
+                }
+            }
+            return conversation.messages.map(m => ({ ...m, fromSelf: m.sender_name === myName }));
         }
     });
 

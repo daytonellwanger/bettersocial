@@ -27,6 +27,8 @@ export interface Message {
     is_unsent: boolean;
 }
 
+export type MessagePlus = Message & { fromSelf: boolean; };
+
 export interface Conversation {
     title: string;
     participants: Participant[];
