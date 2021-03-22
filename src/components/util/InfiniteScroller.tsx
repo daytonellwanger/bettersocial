@@ -81,7 +81,11 @@ export default function InfiniteScroller(props: P) {
         if (props.renderItems) {
             return props.renderItems!(loadedItems);
         } else if (props.renderItem) {
-            return loadedItems.map(i => props.renderItem!(i));
+            return loadedItems.map((item, index) => (
+                <div key={index}>
+                    {props.renderItem!(item)}
+                </div>
+            ));
         }
     }
 
