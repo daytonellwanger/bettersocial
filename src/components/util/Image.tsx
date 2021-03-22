@@ -25,11 +25,15 @@ export default class Image extends React.Component<P, PhotoData> {
 
     render() {
         if (this.state.webViewLink && !this.state.content) {
-            return (
-                <Link href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
-                    <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={this.state.thumbnailLink} />
-                </Link>
-            );
+            if (this.props.link) {
+                return (
+                    <Link href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
+                        <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={this.state.thumbnailLink} />
+                    </Link>
+                );
+            } else {
+                return <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={this.state.thumbnailLink} />;
+            }
         } else {
             if (this.props.link) {
                 return (
