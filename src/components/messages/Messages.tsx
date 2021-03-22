@@ -47,7 +47,7 @@ export default function Messages() {
                             )}
                         </AutoSizer>
                     </div>
-                    <div style={{ flex: 2, overflowY: 'scroll' }} ref={conversationsRef}>
+                    <div style={{ flex: 2, overflowY: 'scroll', display: 'flex', flexDirection: 'column-reverse' }} ref={conversationsRef}>
                         {
                             selectedConversation
                                 ? <Conversation id={selectedConversation.id} name={selectedConversation.name} scrollableTarget={conversationsRef.current} />

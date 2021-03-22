@@ -14,6 +14,7 @@ export default function Conversation(props: P) {
 
     return (
         <InfiniteScroller id={props.id}
+            inverse={true}
             pageSize={25}
             getFetchRequests={() => getConversationsRequests(props.id)}
             renderItem={(message: MessageData) => <Message key={message.timestamp_ms} { ...message } />}

@@ -5,6 +5,7 @@ import PulseLoader from 'react-spinners/PulseLoader';
 export type Fetch = () => Promise<any[]>;
 export interface P {
     pageSize: number;
+    inverse?: boolean;
     id?: string;
     fetchRequests?: Fetch[];
     getFetchRequests?: () => Promise<Fetch[]>;
@@ -100,6 +101,8 @@ export default function InfiniteScroller(props: P) {
     } else {
         return (
             <InfiniteScroll
+                style={props.inverse ? { display: 'flex', flexDirection: 'column-reverse' } : undefined}
+                inverse={props.inverse}
                 dataLength={loadedItems.length}
                 next={() => nextPage()}
                 hasMore={fetchedItems.current.length > loadedItems.length || fetchRequestsIdx.current < fetchRequests.current!.length}
