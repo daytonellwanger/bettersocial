@@ -42,20 +42,23 @@ export default function ImageList(props: P) {
     const columns = getColumns(width);
 
     return (
-        <Container>
-            <InfiniteScroller
-                pageSize={30}
-                fetchRequests={props.fetchRequests}
-                renderItems={(items: any[]) => (
-                    <div style={{ overflow: 'hidden' }}>
-                        <GridList cellHeight={250} cols={columns}>
-                            <GridListTile key="Subheader" cols={columns} style={{ height: 'auto' }}>
-                                {props.renderTitle()}
-                            </GridListTile>
-                            {items.map(item => props.renderItem(item))}
-                        </GridList>
-                    </div>
-                )} />
-        </Container>
+        <div style={{ height: '100%', overflowY: 'scroll' }} id="imageListContainer">
+            <Container>
+                <InfiniteScroller
+                    scrollableTarget="imageListContainer"
+                    pageSize={30}
+                    fetchRequests={props.fetchRequests}
+                    renderItems={(items: any[]) => (
+                        <div style={{ overflow: 'hidden' }}>
+                            <GridList cellHeight={250} cols={columns}>
+                                <GridListTile key="Subheader" cols={columns} style={{ height: 'auto' }}>
+                                    {props.renderTitle()}
+                                </GridListTile>
+                                {items.map(item => props.renderItem(item))}
+                            </GridList>
+                        </div>
+                    )} />
+            </Container>
+        </div>
     );
 }

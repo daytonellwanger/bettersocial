@@ -5,8 +5,10 @@ import InfiniteScroller from './util/InfiniteScroller';
 
 export default function Page(page: P) {
     return (
-        <Container style={{ paddingTop: '1em' }} maxWidth="sm">
-            <InfiniteScroller {...page.data} />
-        </Container>
+        <div style={{ height: '100%', overflowY: 'scroll' }} id="pageContainer">
+            <Container style={{ paddingTop: '1em' }} maxWidth="sm">
+                <InfiniteScroller {...page.data} scrollableTarget="pageContainer" />
+            </Container>
+        </div>
     );
 }

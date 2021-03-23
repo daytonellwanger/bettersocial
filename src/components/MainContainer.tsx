@@ -13,10 +13,10 @@ export default function MainContainer(props: P) {
     const classes = useStyles();
 
     return (
-        <div>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <TopBar signOut={props.signOut} homeEnabled={props.homeEnabled} />
             <div className={classes.toolbar} />
-            <div>
+            <div style={{ flex: 1, overflow: 'hidden' }}>
                 {props.children}
             </div>
         </div>

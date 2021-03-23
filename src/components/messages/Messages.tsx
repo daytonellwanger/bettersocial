@@ -35,9 +35,9 @@ export default function Messages() {
     }
 
     return (
-        <Container style={{ paddingTop: '1em', height: '85%' }} maxWidth="lg">
-            <Card elevation={3}>
-                <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
+        <Container style={{ padding: '1.5em', height: '100%' }} maxWidth="lg">
+            <Card elevation={3} style={{ height: '100%' }}>
+                <div style={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
                     <div style={{ flex: 1 }}>
                         <AutoSizer>
                             {({ width, height }) => (
@@ -47,7 +47,7 @@ export default function Messages() {
                             )}
                         </AutoSizer>
                     </div>
-                    <div style={{ flex: 2, overflowY: 'scroll', display: 'flex', flexDirection: 'column-reverse' }} ref={conversationsRef}>
+                    <div style={{ flex: 2, height: '100%', display: 'flex', flexDirection: 'column-reverse', overflowY: 'scroll' }} ref={conversationsRef}>
                         {
                             selectedConversation
                                 ? <Conversation id={selectedConversation.id} name={selectedConversation.name} scrollableTarget={conversationsRef.current} />
