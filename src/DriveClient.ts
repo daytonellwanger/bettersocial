@@ -9,7 +9,8 @@ export const mainFolderName = 'facebook-data';
 class DriveClient {
 
     private initPromise: Promise<void> | undefined;
-    private root: gapi.client.drive.File[] | undefined;
+    private root: gapi.client.drive.File[] | undefined
+    private posts: Promise<PostWithAttachment[]> | undefined;
 
     public async init(force = false) {
         if (!this.initPromise || force) {
@@ -36,6 +37,20 @@ class DriveClient {
 
                 resolve();
             });
+
+            this.posts = new Promise(async (resolve, reject) => {
+                const posts: PostWithAttachment[] = [];
+                const postsFiles = await this.getFilesFromRootFolder('posts', 'your_posts');
+                postsFiles.sort((a, b) => a.name!.localeCompare(b.name!));
+                for (let file of postsFiles) {
+                    if (!file.id) {
+                        continue;
+                    }
+                    const partialPosts = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as PostWithAttachment[];
+                    posts.push(...partialPosts);
+                }
+                resolve(posts);
+            });
         }
         return this.initPromise;
     }
@@ -51,9 +66,9 @@ class DriveClient {
             throw new Error(`${folderName} has no ID`);
         }
 
-        const fileNameQuery = exactFileName 
-                                ? `name="${fileName}"`
-                                : `name contains "${fileName}"`;
+        const fileNameQuery = exactFileName
+            ? `name="${fileName}"`
+            : `name contains "${fileName}"`;
         const files = (await gapi.client.drive.files.list({ q: `"${folder.id}" in parents and ${fileNameQuery}` })).result.files!;
         if (!files || files.length === 0) {
             throw new Error(`Could not find file ${fileName}`);
@@ -79,13 +94,9 @@ class DriveClient {
     }
 
     public async getPosts() {
-        const postsFiles = await this.getFilesFromRootFolder('posts', 'your_posts');
-        return postsFiles.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
-            return async () => {
-                const posts = (await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as PostWithAttachment[];
-                return posts;
-            }
-        });
+        await this.init();
+        const posts = await this.posts!;
+        return posts;
     }
 
     public async getComments() {

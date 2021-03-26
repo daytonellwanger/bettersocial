@@ -19,7 +19,7 @@ export const posts: Page = {
         title: 'Your Posts'
     },
     data: {
-        getFetchRequests: () => driveClient.getPosts(),
+        fetchRequests: [() => driveClient.getPosts()],
         pageSize: 25,
         renderItem: (p: PostObject | PostWithAttachment) => <Post { ...p } />
     }
