@@ -1,9 +1,8 @@
 import React from 'react';
-import { Button, Container, Typography } from '@material-ui/core';
+import { Button, Container, LinearProgress, Typography } from '@material-ui/core';
 import CSS from 'csstype';
 import JSZip from 'jszip';
 import { uploadFiles } from '../upload';
-import ProgressBar from './util/ProgressBar';
 
 interface P {
     onUploadComplete: () => void;
@@ -30,9 +29,10 @@ export default class Upload extends React.Component<P, S> {
     render() {
         if (this.state.uploading) {
             return (
-                <div style={progressContainerStyle}>
-                    <ProgressBar progress={this.state.progress} message={this.state.message} />
-                </div>
+                <Container maxWidth="md" style={{ padding: '2em' }}>
+                    <LinearProgress variant="determinate" color="secondary" value={this.state.progress*100} style={{ marginBottom: '.5em' }} />
+                    <Typography variant="caption" color="secondary">{this.state.message}</Typography>
+                </Container>
             )
         } else {
             return (
