@@ -6,7 +6,7 @@ import Image from '../util/Image';
 
 export default function Post(post: PostObject | PostWithAttachment) {
     return (
-        <Card elevation={3} style={{ padding: '1em', marginBottom: '1em' }}>
+        <Card elevation={3} style={{ padding: '1em' }}>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <div style={{ flex: 2 }}>
                     <Typography style={{ paddingRight: '5em' }} variant="caption" color="textSecondary">{decodeString(post.title || '')}</Typography>
@@ -62,7 +62,7 @@ function renderAttachments(post: PostWithAttachment) {
 }
 
 function renderExternalContextAttachmentData(data: ExternalContextAttachmentData) {
-    return <Link color="primary" variant="button" href={data.external_context.url}>{data.external_context.url}</Link>;
+    return <Link color="secondary" variant="button" href={data.external_context.url}>{data.external_context.url}</Link>;
 }
 
 function renderMediaAttachmentData(data: MediaAttachmentData) {

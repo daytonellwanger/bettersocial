@@ -1,5 +1,5 @@
 import { PostWithAttachment } from './contracts/posts';
-import { AlbumIndex, AlbumIndexEntry, Video, VideosInfo } from './contracts/photos';
+import { Album, AlbumIndex, AlbumIndexEntry, Photo, Video, VideosInfo } from './contracts/photos';
 import { Comment } from './contracts/comments';
 import { Conversation, ConversationFolder, ConversationIndex, MessagePlus } from './contracts/messages';
 import { requestQueue } from './requests';
@@ -9,8 +9,11 @@ export const mainFolderName = 'facebook-data';
 class DriveClient {
 
     private initPromise: Promise<void> | undefined;
-    private root: gapi.client.drive.File[] | undefined
+    private root: gapi.client.drive.File[] | undefined;
     private posts: Promise<PostWithAttachment[]> | undefined;
+    private comments: Promise<Comment[]> | undefined;
+    private albums: Promise<AlbumIndexEntry[]> | undefined;
+    private conversations: Promise<ConversationFolder[]> | undefined;
 
     public async init(force = false) {
         if (!this.initPromise || force) {
@@ -37,22 +40,55 @@ class DriveClient {
 
                 resolve();
             });
-
-            this.posts = new Promise(async (resolve, reject) => {
-                const posts: PostWithAttachment[] = [];
-                const postsFiles = await this.getFilesFromRootFolder('posts', 'your_posts');
-                postsFiles.sort((a, b) => a.name!.localeCompare(b.name!));
-                for (let file of postsFiles) {
-                    if (!file.id) {
-                        continue;
-                    }
-                    const partialPosts = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as PostWithAttachment[];
-                    posts.push(...partialPosts);
-                }
-                resolve(posts);
-            });
+            this.getContent();
         }
         return this.initPromise;
+    }
+
+    private async getContent() {
+        this.posts = new Promise(async (resolve, reject) => {
+            const posts: PostWithAttachment[] = [];
+            const postsFiles = await this.getFilesFromRootFolder('posts', 'your_posts');
+            postsFiles.sort((a, b) => a.name!.localeCompare(b.name!));
+            for (let file of postsFiles) {
+                if (!file.id) {
+                    continue;
+                }
+                const partialPosts = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as PostWithAttachment[];
+                posts.push(...partialPosts);
+            }
+            resolve(posts);
+        });
+
+        this.comments = new Promise(async (resolve, reject) => {
+            const comments: Comment[] = [];
+            const commentFiles = await this.getFilesFromRootFolder('comments', 'comments');
+            commentFiles.sort((a, b) => a.name!.localeCompare(b.name!));
+            for (let file of commentFiles) {
+                if (!file.id) {
+                    continue;
+                }
+                const partialComments = ((await requestQueue.request(() => gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as any).comments as Comment[];
+                comments.push(...partialComments);
+            }
+            resolve(comments);
+        });
+
+        this.albums = new Promise(async (resolve, reject) => {
+            const albumIndex = (await this.getRootFile('albumIndex.json')) as AlbumIndex;
+            albumIndex.albums.sort((a, b) => b.timestamp - a.timestamp);
+            resolve(albumIndex.albums);
+        });
+
+        this.conversations = new Promise(async (resolve, reject) => {
+            const conversationIndex = (await this.getRootFile('conversationIndex.json')) as ConversationIndex;
+            resolve(conversationIndex.conversations.map(c => (
+                {
+                    name: c.title,
+                    id: c.folderId
+                }
+            )).sort((a, b) => a.name.localeCompare(b.name)));
+        });
     }
 
     private async getFilesFromRootFolder(folderName: string, fileName: string, exactFileName = false) {
@@ -85,7 +121,7 @@ class DriveClient {
             throw new Error(`Could not find file ${name}`);
         }
 
-        const fileContents = (await gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' })).result!;
+        const fileContents = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result!;
         if (!fileContents) {
             throw new Error(`Could not read file ${name}`);
         }
@@ -99,14 +135,20 @@ class DriveClient {
         return posts;
     }
 
+    public async getRandomPost() {
+        const posts = await this.getPosts();
+        return posts[Math.floor(Math.random() * posts.length)];
+    }
+
     public async getComments() {
-        const commentsFiles = await this.getFilesFromRootFolder('comments', 'comments');
-        return commentsFiles.filter(f => !!f.id).sort((a, b) => a.name!.localeCompare(b.name!)).map(f => {
-            return async () => {
-                const comments = ((await gapi.client.drive.files.get({ fileId: f.id!, alt: 'media' })).result as any).comments as Comment[];
-                return comments;
-            }
-        });
+        await this.init();
+        const comments = await this.comments!;
+        return comments;
+    }
+
+    public async getRandomComment() {
+        const comments = await this.getComments();
+        return comments[Math.floor(Math.random() * comments.length)];
     }
 
     public async getVideos(): Promise<VideosInfo> {
@@ -134,21 +176,42 @@ class DriveClient {
     }
 
     public async getAlbumFiles(): Promise<AlbumIndexEntry[]> {
-        const albumIndex = (await this.getRootFile('albumIndex.json')) as AlbumIndex;
-        albumIndex.albums.sort((a, b) => b.timestamp - a.timestamp);
-        return albumIndex.albums;
+        await this.init();
+        const albums = await this.albums!;
+        return albums;
+    }
+
+    public async getRandomPhoto(): Promise<Photo> {
+        const albums = await this.getAlbumFiles();
+        const randomAlbumId = albums[Math.floor(Math.random() * albums.length)].id;
+        const randomAlbum = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: randomAlbumId, alt: 'media' }))).result as Album;
+        const randomPhoto = randomAlbum.photos[Math.floor(Math.random() * randomAlbum.photos.length)];
+        return randomPhoto;
     }
 
     public async getConversationFolders(): Promise<ConversationFolder[]> {
-        const conversationIndex = (await this.getRootFile('conversationIndex.json')) as ConversationIndex;
-        return conversationIndex.conversations.map(c => (
-            {
-                name: c.title,
-                id: c.folderId
-            }
-        )).sort((a, b) => a.name.localeCompare(b.name));
+        await this.init();
+        const conversations = await this.conversations!;
+        return conversations;
     }
 
+    public async getRandomMessages(): Promise<MessagePlus[]> {
+        const conversations = await this.getConversationFolders();
+        const randomConversationId = conversations[Math.floor(Math.random() * conversations.length)].id;
+        const randomConversationFile = (await requestQueue.request(() => gapi.client.drive.files.list({ q: `"${randomConversationId}" in parents and name contains 'message_'` }))).result.files![0];
+        const randomConversation = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: randomConversationFile.id!, alt: 'media' }))).result as Conversation;
+        let myName = '';
+        if (randomConversation.participants.length <= 3) {
+            for (let participant of randomConversation.participants) {
+                if (randomConversation.title.indexOf(participant.name) < 0) {
+                    myName = participant.name;
+                    break;
+                }
+            }
+        }
+        const randomMessageIdx = Math.floor(Math.random() * randomConversation.messages.length);
+        return randomConversation.messages.slice(randomMessageIdx, Math.min(randomMessageIdx + 5, randomConversation.messages.length)).map(m => ({ ...m, fromSelf: m.sender_name === myName }));
+    }
 }
 
 export interface PhotoData {

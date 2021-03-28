@@ -21,7 +21,7 @@ export const posts: Page = {
     data: {
         fetchRequests: [() => driveClient.getPosts()],
         pageSize: 25,
-        renderItem: (p: PostObject | PostWithAttachment) => <Post { ...p } />
+        renderItem: (p: PostObject | PostWithAttachment) => (<div style={{ marginBottom: '1em' }}><Post { ...p } /></div>)
     }
 };
 
@@ -33,10 +33,7 @@ export const comments: Page = {
         subtitle: 'Comments you\'ve posted'
     },
     data: {
-        getFetchRequests: async () => {
-            const comments = (await driveClient.getComments())!;
-            return comments;
-        },
+        fetchRequests: [() => driveClient.getComments()],
         pageSize: 25,
         renderItem: (c: CommentData) => <Comment { ...c } />
     }

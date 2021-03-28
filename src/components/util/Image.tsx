@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CardMedia, Link } from '@material-ui/core';
 import { getPhotoData, PhotoData } from '../../DriveClient';
 import './Image.css';
@@ -8,46 +8,44 @@ interface P {
     link?: boolean;
 }
 
-export default class Image extends React.Component<P, PhotoData> {
+export default function Image(props: P) {
 
-    state: PhotoData = {
-        content: '',
-        webViewLink: '',
-        thumbnailLink: ''
-    }
+    const [photoData, setPhotoData] = useState<PhotoData>({ content: '', webViewLink: '', thumbnailLink: '' });
 
-    async componentDidMount() {
-        const photoData = await getPhotoData(this.props.uri);
-        if (photoData) {
-            this.setState({ ...photoData });
+    useEffect(() => {
+        async function fetchPhoto() {
+            const photoData = await getPhotoData(props.uri);
+            if (photoData) {
+                setPhotoData(photoData);
+            }
         }
-    }
+        fetchPhoto();
+    }, [props.uri]);
 
-    render() {
-        if (this.state.webViewLink && !this.state.content) {
-            if (this.props.link) {
-                return (
-                    <Link href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
-                        <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={this.state.thumbnailLink} />
-                    </Link>
-                );
-            } else {
-                return <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={this.state.thumbnailLink} />;
-            }
+
+    if (photoData.webViewLink && !photoData.content) {
+        if (props.link) {
+            return (
+                <Link href={photoData.webViewLink} target="_blank" rel="noopener noreferrer">
+                    <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={photoData.thumbnailLink} />
+                </Link>
+            );
         } else {
-            if (this.props.link) {
-                return (
-                    <Link href={this.state.webViewLink} target="_blank" rel="noopener noreferrer">
-                        <CardMedia
-                            style={{ height: 0, paddingTop: '56.25%' }}
-                            image={`data:image/jpeg;base64,${btoa(this.state.content)}`} />
-                    </Link>
-                );
-            } else {
-                return <CardMedia
-                    style={{ height: 0, paddingTop: '56.25%' }}
-                    image={`data:image/jpeg;base64,${btoa(this.state.content)}`} />;
-            }
+            return <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={photoData.thumbnailLink} />;
+        }
+    } else {
+        if (props.link) {
+            return (
+                <Link href={photoData.webViewLink} target="_blank" rel="noopener noreferrer">
+                    <CardMedia
+                        style={{ height: 0, paddingTop: '56.25%' }}
+                        image={`data:image/jpeg;base64,${btoa(photoData.content)}`} />
+                </Link>
+            );
+        } else {
+            return <CardMedia
+                style={{ height: 0, paddingTop: '56.25%' }}
+                image={`data:image/jpeg;base64,${btoa(photoData.content)}`} />;
         }
     }
 
