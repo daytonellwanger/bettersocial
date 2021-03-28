@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button, Container, Typography } from '@material-ui/core';
 import CSS from 'csstype';
 import JSZip from 'jszip';
 import { uploadFiles } from '../upload';
@@ -35,31 +36,35 @@ export default class Upload extends React.Component<P, S> {
             )
         } else {
             return (
-                <div style={{ padding: '10px' }}>
-                    <p>Welcome to Social Freedom! To get started, upload your Facebook data file.</p>
-                    <div style={uploadContainerStyle}>
-                        <div style={this.state.itemOverDropZone ? activeDropZoneStyle : inactiveDropZoneStyle}
-                            onDrop={(event) => this.handleDropFile(event)}
-                            onDragOver={(event) => {
-                                event.preventDefault();
-                                this.setState({ ...this.state, itemOverDropZone: true })
-                            }}
-                            onDragLeave={(event) => {
-                                event.preventDefault();
-                                this.setState({ ...this.state, itemOverDropZone: false })
-                            }}>
-                            Drag and drop here
-                        </div>
-                        <p>or select with the file picker</p>
-                        <form>
-                            <input
-                                type="file"
-                                accept=".zip"
-                                onChange={() => this.handleFileInput()}
-                                ref={ref => this.inputRef = ref} />
-                        </form>
+                <Container style={{ padding: '2em' }} maxWidth="sm">
+                    <Typography color="secondary" variant="h5">Welcome to Social Freedom! To get started, upload your Facebook data file.</Typography>
+                    <div style={this.state.itemOverDropZone ? activeDropZoneStyle : inactiveDropZoneStyle}
+                        onDrop={(event) => this.handleDropFile(event)}
+                        onDragOver={(event) => {
+                            event.preventDefault();
+                            this.setState({ ...this.state, itemOverDropZone: true })
+                        }}
+                        onDragLeave={(event) => {
+                            event.preventDefault();
+                            this.setState({ ...this.state, itemOverDropZone: false })
+                        }}>
+                        <Typography color="textSecondary" variant="caption">Drag and drop here</Typography>
                     </div>
-                </div >
+                    <Typography color="secondary" variant="caption">or select with the file picker</Typography>
+                    <div style={{ height: '.5em' }} />
+                    <Button
+                        variant="contained"
+                        component="label">
+                        Upload File
+                        <input
+                            type="file"
+                            hidden
+                            accept=".zip"
+                            onChange={() => this.handleFileInput()}
+                            ref={ref => this.inputRef = ref}
+                        />
+                    </Button>
+                </Container>
             );
         }
     }
@@ -115,33 +120,27 @@ const progressContainerStyle: CSS.Properties = {
     alignItems: 'center'
 };
 
-const uploadContainerStyle: CSS.Properties = {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-};
-
 const baseDropZoneStyle: CSS.Properties = {
     border: 'dotted',
-    borderWidth: '1px',
-    borderColor: '#aaaaaa',
+    borderWidth: '3px',
+    borderColor: '#37474f',
     width: '100%',
     maxWidth: '500px',
     height: '20%',
     maxHeight: '200px',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: '1em',
+    marginBottom: '1em'
 };
 
 const inactiveDropZoneStyle: CSS.Properties = {
     ...baseDropZoneStyle,
-    backgroundColor: '#ddddea'
+    backgroundColor: '#37474f22'
 }
 
 const activeDropZoneStyle: CSS.Properties = {
     ...baseDropZoneStyle,
-    backgroundColor: '#4267b249'
+    backgroundColor: '#37474f49'
 }
