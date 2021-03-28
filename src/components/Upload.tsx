@@ -3,6 +3,7 @@ import { Button, Container, LinearProgress, Typography } from '@material-ui/core
 import CSS from 'csstype';
 import JSZip from 'jszip';
 import { uploadFiles } from '../upload';
+import YourInfo from './YourInfo';
 
 interface P {
     onUploadComplete: () => void;
@@ -13,6 +14,7 @@ interface S {
     progress: number;
     message: string;
     itemOverDropZone: boolean;
+    zip?: JSZip;
 }
 
 export default class Upload extends React.Component<P, S> {
@@ -32,12 +34,13 @@ export default class Upload extends React.Component<P, S> {
                 <Container maxWidth="md" style={{ padding: '2em' }}>
                     <LinearProgress variant="determinate" color="secondary" value={this.state.progress*100} style={{ marginBottom: '.5em' }} />
                     <Typography variant="caption" color="secondary">{this.state.message}</Typography>
+                    {this.state.zip ? <YourInfo zip={this.state.zip} /> : undefined}
                 </Container>
             )
         } else {
             return (
                 <Container style={{ padding: '2em' }} maxWidth="sm">
-                    <Typography color="secondary" variant="h5">Welcome to Social Freedom! To get started, upload your Facebook data file.</Typography>
+                    <Typography color="secondary" variant="body1">Welcome to Social Freedom! To get started, upload your data.</Typography>
                     <div style={this.state.itemOverDropZone ? activeDropZoneStyle : inactiveDropZoneStyle}
                         onDrop={(event) => this.handleDropFile(event)}
                         onDragOver={(event) => {
@@ -54,6 +57,7 @@ export default class Upload extends React.Component<P, S> {
                     <div style={{ height: '.5em' }} />
                     <Button
                         variant="contained"
+                        color="primary"
                         component="label">
                         Upload File
                         <input
@@ -105,6 +109,7 @@ export default class Upload extends React.Component<P, S> {
     private async uploadFile(file: File) {
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zip = await JSZip.loadAsync(file!);
+        this.setState({ zip });
         await uploadFiles(zip, (progress, message) => this.setState({ progress, message }));
         this.props.onUploadComplete();
     }

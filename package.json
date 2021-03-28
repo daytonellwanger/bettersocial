@@ -16,6 +16,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-spinners": "^0.10.6",
+    "react-ticker": "^1.2.2",
     "react-virtualized-auto-sizer": "^1.0.5",
     "react-window": "^1.8.6",
     "typescript": "~3.7.2"
