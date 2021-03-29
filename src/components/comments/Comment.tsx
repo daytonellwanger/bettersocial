@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Card, Typography } from '@material-ui/core';
+import { Box, Card, Hidden, Typography } from '@material-ui/core';
 import { Comment as CommentData } from '../../contracts/comments';
-import { decodeString, getTimeString } from '../../util';
+import { decodeString, getTimeString, getTimeStringFirstLine, getTimeStringSecondLine } from '../../util';
 
 export default function Comment(comment: CommentData) {
     return (
@@ -11,10 +11,18 @@ export default function Comment(comment: CommentData) {
                     <Typography style={{ paddingRight: '5em' }} variant="caption" color="textSecondary">{decodeString(comment.title)}</Typography>
                 </Box>
                 <Box style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Typography variant="caption" color="textSecondary">{getTimeString(comment.timestamp)}</Typography>
+                    <Hidden smUp>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                            <Typography variant="caption" color="textSecondary">{getTimeStringFirstLine(comment.timestamp)}</Typography>
+                            <Typography variant="caption" color="textSecondary">{getTimeStringSecondLine(comment.timestamp)}</Typography>
+                        </div>
+                    </Hidden>
+                    <Hidden xsDown>
+                        <Typography variant="caption" color="textSecondary">{getTimeString(comment.timestamp)}</Typography>
+                    </Hidden>
                 </Box>
             </Box>
-            {renderGroup(comment)}         
+            {renderGroup(comment)}
             <Typography variant="body2" color="textPrimary">{decodeString(comment.data ? comment.data[0].comment.comment : '')}</Typography>
         </Card>
     );

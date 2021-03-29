@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Container, GridList, GridListTile, GridListTileBar, IconButton } from '@material-ui/core';
+import { Button, Container, GridList, GridListTile, GridListTileBar, IconButton, useMediaQuery, useTheme } from '@material-ui/core';
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import driveClient from '../DriveClient';
 import { getTimeString } from '../util';
@@ -27,6 +28,30 @@ function Section(props: React.PropsWithChildren<{ title: string, link: string, o
     );
 }
 
+function useWidth() {
+    const theme = useTheme();
+    const keys = [...theme.breakpoints.keys].reverse();
+    return keys.reduce((output: Breakpoint | null, key: Breakpoint) => {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const matches = useMediaQuery(theme.breakpoints.up(key));
+            return !output && matches ? key : output;
+        }, null)
+        || 'xs';
+}
+
+function getCellHeight(width: Breakpoint) {
+    switch (width) {
+        case 'xs':
+        case 'sm':
+            return 180;
+        case 'md':
+        case 'lg':
+        case 'xl':
+        default:
+            return 300;
+    }
+}
+
 export default function Home() {
 
     const now = (new Date()).getTime();
@@ -34,6 +59,7 @@ export default function Home() {
     const [photo, setPhoto] = useState<PhotoData>({ title: '', uri: undefined as any, creation_timestamp: now });
     const [comment, setComment] = useState<CommentData>({ title: '', timestamp: now });
     const [messages, setMessages] = useState<MessagePlus[]>([]);
+    const width = useWidth();
 
     async function getRandomPost() {
         const post = await driveClient.getRandomPost();
@@ -69,7 +95,7 @@ export default function Home() {
                     <Post {...post} />
                 </Section>
                 <Section title="Photos and Videos" link="/photos" onRefresh={() => getRandomPhoto()}>
-                    <GridList cellHeight={300} cols={1}>
+                    <GridList cellHeight={getCellHeight(width)} cols={1}>
                         <GridListTile>
                             {photo.uri ? <Image uri={photo.uri} link={true} /> : undefined}
                             <GridListTileBar

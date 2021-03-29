@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Link, Typography } from '@material-ui/core';
-import { decodeString, getTimeString } from '../../util';
+import { Card, Hidden, Link, Typography } from '@material-ui/core';
+import { decodeString, getTimeString, getTimeStringFirstLine, getTimeStringSecondLine } from '../../util';
 import { ExternalContextAttachmentData, MediaAttachmentData, Post as PostObject, PostData, PostWithAttachment } from '../../contracts/posts';
 import Image from '../util/Image';
 
@@ -12,7 +12,15 @@ export default function Post(post: PostObject | PostWithAttachment) {
                     <Typography style={{ paddingRight: '5em' }} variant="caption" color="textSecondary">{decodeString(post.title || '')}</Typography>
                 </div>
                 <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Typography variant="caption" color="textSecondary">{getTimeString(post.timestamp)}</Typography>
+                    <Hidden smUp>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                            <Typography variant="caption" color="textSecondary">{getTimeStringFirstLine(post.timestamp)}</Typography>
+                            <Typography variant="caption" color="textSecondary">{getTimeStringSecondLine(post.timestamp)}</Typography>
+                        </div>
+                    </Hidden>
+                    <Hidden xsDown>
+                        <Typography variant="caption" color="textSecondary">{getTimeString(post.timestamp)}</Typography>
+                    </Hidden>
                 </div>
             </div>
             {renderTags(post)}
