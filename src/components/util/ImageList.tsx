@@ -1,5 +1,5 @@
 import React from 'react';
-import { GridList, GridListTile, Container, useMediaQuery } from '@material-ui/core';
+import { GridList, Container, useMediaQuery } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import InfiniteScroller, { Fetch } from '../util/InfiniteScroller';
@@ -50,10 +50,8 @@ export default function ImageList(props: P) {
                     fetchRequests={props.fetchRequests}
                     renderItems={(items: any[]) => (
                         <div style={{ overflow: 'hidden' }}>
+                            {props.renderTitle()}
                             <GridList cellHeight={250} cols={columns}>
-                                <GridListTile key="Subheader" cols={columns} style={{ height: 'auto' }}>
-                                    {props.renderTitle()}
-                                </GridListTile>
                                 {items.map(item => props.renderItem(item))}
                             </GridList>
                         </div>
