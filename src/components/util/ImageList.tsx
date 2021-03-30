@@ -43,7 +43,7 @@ export default function ImageList(props: P) {
 
     return (
         <div style={{ height: '100%', overflowY: 'scroll' }} id="imageListContainer">
-            <Container>
+            <Container style={{ paddingLeft: '.4em', paddingRight: '.4em' }}>
                 <InfiniteScroller
                     scrollableTarget="imageListContainer"
                     pageSize={30}

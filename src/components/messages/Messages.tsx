@@ -91,7 +91,7 @@ export default function Messages() {
     function getSmallContent() {
         if (listOpen) {
             return (
-                <Container style={{ padding: '1.5em', height: '100%' }} maxWidth="lg">
+                <Container style={{ padding: '.4em', height: '100%' }} maxWidth="lg">
                     <Card elevation={3} style={{ height: '100%' }}>
                         <AutoSizer>
                             {({ width, height }) => (
@@ -105,7 +105,7 @@ export default function Messages() {
             );
         } else {
             return (
-                <Container style={{ padding: '1.5em', height: '100%' }} maxWidth="lg">
+                <Container style={{ padding: '.4em', height: '100%' }} maxWidth="lg">
                     <Card elevation={3} style={{ height: '100%' }}>
                         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', alignItems: 'flex-start' }}>

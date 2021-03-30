@@ -16,7 +16,7 @@ import Message from './messages/Message';
 
 function Section(props: React.PropsWithChildren<{ title: string, link: string, onRefresh: () => void }>) {
     return (
-        <Container maxWidth="sm" style={{ marginBottom: '1em' }}>
+        <Container maxWidth="sm" style={{ marginBottom: '1em', paddingLeft: 0, paddingRight: 0 }}>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Button color="secondary" component={Link} to={props.link}>{props.title}</Button>
                 <IconButton onClick={props.onRefresh}>
@@ -90,7 +90,7 @@ export default function Home() {
 
     return (
         <div style={{ height: '100%', overflowY: 'scroll' }}>
-            <Container style={{ paddingTop: '1em' }}>
+            <Container style={{ paddingTop: '1em', paddingLeft: '.4em', paddingRight: '.4em' }}>
                 <Section title="Posts" link="/posts" onRefresh={() => getRandomPost()}>
                     <Post {...post} />
                 </Section>
