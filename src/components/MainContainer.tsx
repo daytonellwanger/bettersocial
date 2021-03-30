@@ -16,7 +16,7 @@ export default function MainContainer(props: P) {
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <TopBar signOut={props.signOut} homeEnabled={props.homeEnabled} />
             <div className={classes.toolbar} />
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 {props.children}
             </div>
         </div>
