@@ -105,9 +105,9 @@ export default function Messages() {
             );
         } else {
             return (
-                <Container style={{ padding: '.4em', height: '100%' }} maxWidth="lg">
-                    <Card elevation={3} style={{ height: '100%' }}>
-                        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Container style={{ padding: '.4em', flex: 1, display: 'flex', flexDirection: 'column' }} maxWidth="lg">
+                    <Card elevation={3} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                                 <IconButton onClick={() => setListOpen(true)}>
                                     <ArrowBackIcon color="secondary" />
