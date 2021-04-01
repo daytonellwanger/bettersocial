@@ -27,11 +27,11 @@ export default function Image(props: P) {
         if (props.link) {
             return (
                 <Link href={photoData.webViewLink} target="_blank" rel="noopener noreferrer">
-                    <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={photoData.thumbnailLink} />
+                    <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className={props.uri.endsWith('mp4') ? 'video-thumbnail' : undefined} image={photoData.thumbnailLink} />
                 </Link>
             );
         } else {
-            return <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className='video-thumbnail' image={photoData.thumbnailLink} />;
+            return <CardMedia style={{ height: 0, paddingTop: '56.25%' }} className={props.uri.endsWith('mp4') ? 'video-thumbnail' : undefined} image={photoData.thumbnailLink} />;
         }
     } else {
         if (props.link) {

@@ -234,7 +234,7 @@ export async function getPhotoData(uri: string, includeParentFolderLink = false)
     }
     // TODO: run these in parallel?
     let photoContent = '';
-    if (fileName.endsWith('jpg')) {
+    if (fileName.endsWith('jpg') || fileName.endsWith('png') || fileName.endsWith('jpeg') || fileName.endsWith('gif')) {
         photoContent = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoFileId, alt: 'media' }))).body;
     }
     const photoInfo = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: photoFileId, fields: 'webViewLink, thumbnailLink, parents' }))).result;
