@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Container, GridList, GridListTile, GridListTileBar, IconButton, useMediaQuery, useTheme } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import driveClient from '../DriveClient';
 import { getTimeString } from '../util';
@@ -18,7 +19,7 @@ function Section(props: React.PropsWithChildren<{ title: string, link: string, o
     return (
         <Container maxWidth="sm" style={{ marginBottom: '1em', paddingLeft: 0, paddingRight: 0 }}>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Button color="secondary" component={Link} to={props.link}>{props.title}</Button>
+                <Button color="secondary" component={Link} to={props.link} endIcon={<ChevronRightIcon />}>{props.title}</Button>
                 <IconButton onClick={props.onRefresh}>
                     <RefreshIcon color="secondary" />
                 </IconButton>
