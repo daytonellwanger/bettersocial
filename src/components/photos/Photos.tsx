@@ -25,8 +25,10 @@ export default function Photos() {
     return <ImageList 
                 fetchRequests={[async () => {
                     const albums = [...(await driveClient.getAlbumFiles())];
-                    const videoAlbum = await getVideosAlbum();
-                    albums.push(videoAlbum);
+                    try {
+                        const videoAlbum = await getVideosAlbum();
+                        albums.push(videoAlbum);
+                    } catch {}
                     return albums;
                 }]}
                 renderItem={(album: AlbumIndexEntry) => renderAlbum(album)}
