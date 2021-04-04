@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import JSZip from 'jszip';
 import Ticker from 'react-ticker'
@@ -8,11 +8,19 @@ interface P {
     zip: JSZip;
 }
 
+type LocationAndTime = {
+    location: string;
+    time: string;
+};
+
+type LocationsMap = { [location: string]: LocationAndTime[] };
+
 export default function YourInfo(props: P) {
 
     const [contactList, setContactList] = useState<string[]>([]);
     const [offFacebookActivity, setOffFacebookActivity] = useState<string[]>([]);
-    const [locations, setLocations] = useState<string[]>([]);
+    const [locations, setLocations] = useState<LocationsMap>({});
+    const locationKeysIdx = useRef<number>(0);
 
     async function getFileContent(fileName: string): Promise<any> {
         const file = props.zip.files[fileName];
@@ -43,8 +51,15 @@ export default function YourInfo(props: P) {
         async function getLocations() {
             const content = await getFileContent('security_and_login_information/account_activity.json');
             if (content) {
-                const locations = (content['account_activity'] as any[]).map(a => `${getTimeString(a.timestamp)} - ${a.city}, ${a.region}`);
-                setLocations(locations);
+                const locationsList: LocationAndTime[] = (content['account_activity'] as any[]).map(a => ({ time: getTimeString(a.timestamp), location: `${a.city}, ${a.region}` }));
+                const locationsMap: LocationsMap = {};
+                for (let l of locationsList) {
+                    if (!locationsMap[l.location]) {
+                        locationsMap[l.location] = [];
+                    }
+                    locationsMap[l.location].push(l);
+                }
+                setLocations(locationsMap);
             }
         }
 
@@ -87,15 +102,23 @@ export default function YourInfo(props: P) {
         }
     }
 
+    function getRandomLocation() {
+        const locationKeys = Object.keys(locations);
+        const specificLocations = locations[locationKeys[locationKeysIdx.current]];
+        locationKeysIdx.current = (locationKeysIdx.current + 1) % locationKeys.length;
+        const randomLocation = specificLocations[Math.floor(Math.random() * specificLocations.length)];
+        return `${randomLocation.time} - ${randomLocation.location}`;
+    }
+
     function renderLocations() {
-        if (contactList.length > 0) {
+        if (Object.keys(locations).length > 0) {
             return (
                 <div style={{ marginTop: '3em' }}>
                     <Typography variant="body2" color="secondary" style={{ marginBottom: '1em' }}>Locations and times when you interacted with Facebook</Typography>
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
-                                <Typography variant="h6" color="secondary">{locations.length > 0 ? locations[Math.floor(Math.random() * locations.length)] : ''}</Typography>
+                                <Typography variant="h6" color="secondary">{getRandomLocation()}</Typography>
                             </div>
                         )}
                     </Ticker>
