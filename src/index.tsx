@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Main from './components/Main';
+import ErrorHandler from './components/ErrorHandler';
 
 ReactDOM.render(
     <React.StrictMode>
-        <Main />
+        <ErrorHandler />
     </React.StrictMode>,
     document.getElementById('root')
 );
