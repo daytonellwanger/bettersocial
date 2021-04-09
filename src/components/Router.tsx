@@ -63,7 +63,9 @@ export default class Router extends React.Component<P, S> {
             } else {
                 return (
                     <MainContainer homeEnabled={false} signOut={this.props.signOut}>
-                        <Upload onUploadComplete={() => this.initDriveClient()} />
+                        <div style={{ height: '100%', overflowY: 'scroll' }}>
+                            <Upload onUploadComplete={() => this.initDriveClient()} />
+                        </div>
                     </MainContainer>
                 );
             }

@@ -21,6 +21,7 @@ export default function YourInfo(props: P) {
     const [offFacebookActivity, setOffFacebookActivity] = useState<string[]>([]);
     const [locations, setLocations] = useState<LocationsMap>({});
     const locationKeysIdx = useRef<number>(0);
+    const [searches, setSearches] = useState<string[]>([]);
 
     async function getFileContent(fileName: string): Promise<any> {
         const file = props.zip.files[fileName];
@@ -63,9 +64,32 @@ export default function YourInfo(props: P) {
             }
         }
 
+        async function getSearches() {
+            const content = await getFileContent('search_history/your_search_history.json');
+            if (content) {
+                const searchList = (content['searches'] as any[]).map(s => {
+                    try {
+                        return (s.data[0].text as string).toUpperCase();
+                    } catch {
+                        return '';
+                    }
+                });
+                const counts: { [search: string]: number } = {};
+                for (let s of searchList) {
+                    counts[s] = (counts[s] || 0) + 1;
+                }
+                const searchesAndCounts = Object.keys(counts).map(search => ({ search, count: counts[search] }));
+                searchesAndCounts.sort((a, b) => b.count - a.count);
+                const searches = searchesAndCounts.map(sac => `${sac.search} x${sac.count}`);
+                searches.unshift('', '', '');
+                setSearches(searches);
+            }
+        }
+
         getContactList();
         getOffFacebookActivity();
         getLocations();
+        getSearches();
     }, []);
 
     function renderContactList() {
@@ -127,11 +151,29 @@ export default function YourInfo(props: P) {
         }
     }
 
+    function renderSearches() {
+        if (searches.length > 0) {
+            return (
+                <div style={{ marginTop: '3em' }}>
+                    <Typography variant="body2" color="secondary" style={{ marginBottom: '1em' }}>Your searches</Typography>
+                    <Ticker>
+                        {({ index }) => (
+                            <div style={{ marginRight: '3em' }}>
+                                <Typography variant="h6" color="secondary">{searches.length > 0 ? decodeString(searches[index % searches.length]) : ''}</Typography>
+                            </div>
+                        )}
+                    </Ticker>
+                </div>
+            );
+        }
+    }
+
     return (
         <div style={{ marginBottom: '3em' }}>
             {renderContactList()}
             {renderOffFacebookActivity()}
             {renderLocations()}
+            {renderSearches()}
         </div>
     );
 
