@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import JSZip from 'jszip';
 import Ticker from 'react-ticker'
-import { getTimeString } from '../util';
+import { decodeString, getTimeString } from '../util';
 
 interface P {
     zip: JSZip;
@@ -76,7 +76,7 @@ export default function YourInfo(props: P) {
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
-                                <Typography variant="h6" color="secondary">{contactList.length > 0 ? contactList[Math.floor(Math.random() * contactList.length)] : ''}</Typography>
+                                <Typography variant="h6" color="secondary">{contactList.length > 0 ? decodeString(contactList[Math.floor(Math.random() * contactList.length)]) : ''}</Typography>
                             </div>
                         )}
                     </Ticker>
@@ -93,7 +93,7 @@ export default function YourInfo(props: P) {
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
-                                <Typography variant="h6" color="secondary">{contactList.length > 0 ? offFacebookActivity[index % offFacebookActivity.length] : ''}</Typography>
+                                <Typography variant="h6" color="secondary">{contactList.length > 0 ? decodeString(offFacebookActivity[index % offFacebookActivity.length]) : ''}</Typography>
                             </div>
                         )}
                     </Ticker>
@@ -118,7 +118,7 @@ export default function YourInfo(props: P) {
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
-                                <Typography variant="h6" color="secondary">{getRandomLocation()}</Typography>
+                                <Typography variant="h6" color="secondary">{decodeString(getRandomLocation())}</Typography>
                             </div>
                         )}
                     </Ticker>

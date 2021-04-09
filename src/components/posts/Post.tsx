@@ -70,7 +70,7 @@ function renderAttachments(post: PostWithAttachment) {
 }
 
 function renderExternalContextAttachmentData(data: ExternalContextAttachmentData) {
-    return <Link color="secondary" variant="button" href={data.external_context.url} target="_blank">{data.external_context.url}</Link>;
+    return <Link color="secondary" variant="button" href={data.external_context.url} target="_blank">{decodeString(data.external_context.url)}</Link>;
 }
 
 function renderMediaAttachmentData(data: MediaAttachmentData) {

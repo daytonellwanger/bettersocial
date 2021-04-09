@@ -5,7 +5,7 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import driveClient from '../DriveClient';
-import { getTimeString } from '../util';
+import { decodeString, getTimeString } from '../util';
 import { Post as PostData } from '../contracts/posts';
 import { Comment as CommentData } from '../contracts/comments';
 import { Photo as PhotoData } from '../contracts/photos';
@@ -100,7 +100,7 @@ export default function Home() {
                         <GridListTile>
                             {photo.uri ? <Image uri={photo.uri} link={true} /> : undefined}
                             <GridListTileBar
-                                title={photo.description}
+                                title={decodeString(photo.description || '')}
                                 subtitle={getTimeString(photo.creation_timestamp)} />
                         </GridListTile>
                     </GridList>

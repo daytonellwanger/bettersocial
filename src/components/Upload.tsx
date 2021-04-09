@@ -116,15 +116,6 @@ export default class Upload extends React.Component<P, S> {
 
 }
 
-const progressContainerStyle: CSS.Properties = {
-    width: '100%',
-    height: '100%',
-    padding: '10px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-};
-
 const baseDropZoneStyle: CSS.Properties = {
     border: 'dotted',
     borderWidth: '3px',

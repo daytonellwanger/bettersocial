@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GridListTile, GridListTileBar, ListSubheader } from '@material-ui/core';
 import driveClient, { getPhotoData } from '../../DriveClient';
-import { getTimeString } from '../../util';
+import { decodeString, getTimeString } from '../../util';
 import { Album as AlbumData, Photo as PhotoData } from '../../contracts/photos';
 import Image from '../util/Image';
 import ImageList from '../util/ImageList';
@@ -47,7 +47,7 @@ export default function Album(props: P) {
             <GridListTile key={photo.uri}>
                 <Image uri={photo.uri} link={true} />
                 <GridListTileBar
-                    title={photo.description}
+                    title={decodeString(photo.description || '')}
                     subtitle={getTimeString(photo.creation_timestamp)} />
             </GridListTile>
         );
@@ -56,5 +56,5 @@ export default function Album(props: P) {
     return <ImageList
         fetchRequests={[() => fetchPhotos()]}
         renderItem={(photo: PhotoData) => renderPhoto(photo)}
-        renderTitle={() => <ListSubheader component="a" href={folderLink} target="_blank" rel="noopener noreferrer">{props.location.state.name}</ListSubheader>} />;
+        renderTitle={() => <ListSubheader component="a" href={folderLink} target="_blank" rel="noopener noreferrer">{decodeString(props.location.state.name)}</ListSubheader>} />;
 }
