@@ -108,10 +108,11 @@ export default function Messages() {
                 <Container style={{ padding: '.4em', flex: 1, display: 'flex', flexDirection: 'column' }} maxWidth="lg">
                     <Card elevation={3} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: '1em' }}>
                                 <IconButton onClick={() => setListOpen(true)}>
                                     <ArrowBackIcon color="secondary" />
                                 </IconButton>
+                                <Typography noWrap variant="button" color="secondary">{decodeString(selectedConversation?.name || '')}</Typography>
                             </div>
                             <div style={{ flex: 1, flexBasis: 0, flexGrow: 1, display: 'flex', flexDirection: 'column-reverse', overflowY: 'scroll' }} id="convoScroller">
                                 {
