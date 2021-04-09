@@ -113,7 +113,7 @@ export default function Messages() {
                                     <ArrowBackIcon color="secondary" />
                                 </IconButton>
                             </div>
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column-reverse', overflowY: 'scroll' }} id="convoScroller">
+                            <div style={{ flex: 1, flexBasis: 0, flexGrow: 1, display: 'flex', flexDirection: 'column-reverse', overflowY: 'scroll' }} id="convoScroller">
                                 {
                                     selectedConversation
                                         ? <Conversation id={selectedConversation.id} name={selectedConversation.name} scrollableTarget="convoScroller" />
