@@ -1,5 +1,6 @@
-import React from 'react';
-import { AppBar, Button, makeStyles, Toolbar, Typography } from '@material-ui/core';
+import React, { useRef } from 'react';
+import { AppBar, Button, IconButton, makeStyles, Menu, MenuItem, Toolbar, Typography } from '@material-ui/core';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Link } from 'react-router-dom';
 
 interface P {
@@ -9,12 +10,31 @@ interface P {
 
 export default function TopBar(props: P) {
     const classes = useStyles();
+    const appBarRef = useRef();
+    const [isMenuOpen, setIsMenuOpen] = React.useState<boolean>(false);
+
     return (
-        <AppBar position="fixed">
+        <AppBar position="fixed" ref={appBarRef}>
             <Toolbar>
                 <Typography variant="h6" className={classes.title}>Social Freedom</Typography>
                 {props.homeEnabled ? <Button color="secondary" component={Link} to="/">Home</Button> : undefined}
-                <Button color="secondary" onClick={props.signOut}>Log Out</Button>
+                <IconButton onClick={() => setIsMenuOpen(true)}>
+                    <ArrowDropDownIcon color="secondary" />
+                </IconButton>
+                <Menu 
+                    anchorEl={appBarRef.current}
+                    keepMounted
+                    open={isMenuOpen}
+                    onClose={() => setIsMenuOpen(false)}
+                    getContentAnchorEl={null}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <MenuItem onClick={() => setIsMenuOpen(false)}>Fund</MenuItem>
+                    <MenuItem onClick={() => setIsMenuOpen(false)}>Complain</MenuItem>
+                    <MenuItem onClick={() => setIsMenuOpen(false)}>Contact</MenuItem>
+                    <MenuItem onClick={() => { props.signOut(); setIsMenuOpen(false); }}>Logout</MenuItem>
+                </Menu>
             </Toolbar>
         </AppBar>
     );
