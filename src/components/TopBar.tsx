@@ -31,8 +31,8 @@ export default function TopBar(props: P) {
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
                     <MenuItem onClick={() => setIsMenuOpen(false)}>Fund</MenuItem>
-                    <MenuItem onClick={() => setIsMenuOpen(false)}>Complain</MenuItem>
-                    <MenuItem onClick={() => setIsMenuOpen(false)}>Contact</MenuItem>
+                    <MenuItem onClick={() => { window.open('https://www.socialfreedom.life/complain', '_blank'); setIsMenuOpen(false); }}>Complain</MenuItem>
+                    <MenuItem onClick={() => { window.open('https://www.socialfreedom.life/contact', '_blank'); setIsMenuOpen(false); }}>Contact</MenuItem>
                     <MenuItem onClick={() => { props.signOut(); setIsMenuOpen(false); }}>Logout</MenuItem>
                 </Menu>
             </Toolbar>
