@@ -98,7 +98,9 @@ export default function Home() {
                 <Section title="Photos and Videos" link="/photos" onRefresh={() => getRandomPhoto()}>
                     <GridList cellHeight={getCellHeight(width)} cols={1}>
                         <GridListTile>
-                            {photo.uri ? <Image uri={photo.uri} link={true} /> : undefined}
+                            <Link to='/photos'>
+                                {photo.uri ? <Image uri={photo.uri} /> : undefined}
+                            </Link>
                             <GridListTileBar
                                 title={decodeString(photo.description || '')}
                                 subtitle={getTimeString(photo.creation_timestamp)} />
