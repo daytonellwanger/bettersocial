@@ -31,8 +31,7 @@ export default function Photos() {
                     } catch {}
                     return albums;
                 }]}
-                renderItem={(album: AlbumIndexEntry) => renderAlbum(album)}
-                renderTitle={() => <ListSubheader component="div">Albums</ListSubheader>} />;
+                renderItem={(album: AlbumIndexEntry) => renderAlbum(album)} />;
 }
 
 async function getVideosAlbum() {

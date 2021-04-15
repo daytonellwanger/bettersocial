@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Container, GridList, GridListTile, GridListTileBar, IconButton, useMediaQuery, useTheme } from '@material-ui/core';
+import { Button, Container, GridList, GridListTile, GridListTileBar, IconButton, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import RefreshIcon from '@material-ui/icons/Refresh';
@@ -15,14 +15,18 @@ import Image from './util/Image';
 import Comment from './comments/Comment';
 import Message from './messages/Message';
 
-function Section(props: React.PropsWithChildren<{ title: string, link: string, onRefresh: () => void }>) {
+function Section(props: React.PropsWithChildren<{ title: string, label: string, link: string, onRefresh: () => void }>) {
     return (
         <Container maxWidth="sm" style={{ marginBottom: '1em', paddingLeft: 0, paddingRight: 0 }}>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Button color="secondary" component={Link} to={props.link} endIcon={<ChevronRightIcon />}>{props.title}</Button>
-                <IconButton onClick={props.onRefresh}>
-                    <RefreshIcon color="secondary" />
-                </IconButton>
+                <Tooltip title={`See all ${props.label}s`}>
+                    <Button color="secondary" component={Link} to={props.link} endIcon={<ChevronRightIcon />}>{props.title}</Button>
+                </Tooltip>
+                <Tooltip title={`Get random ${props.label}`}>
+                    <IconButton onClick={props.onRefresh}>
+                        <RefreshIcon color="secondary" />
+                    </IconButton>
+                </Tooltip>
             </div>
             {props.children}
         </Container>
@@ -92,10 +96,10 @@ export default function Home() {
     return (
         <div style={{ height: '100%', overflowY: 'scroll' }}>
             <Container style={{ paddingTop: '1em', paddingLeft: '.4em', paddingRight: '.4em' }}>
-                <Section title="Posts" link="/posts" onRefresh={() => getRandomPost()}>
+                <Section title="Posts" label="post" link="/posts" onRefresh={() => getRandomPost()}>
                     <Post {...post} />
                 </Section>
-                <Section title="Photos and Videos" link="/photos" onRefresh={() => getRandomPhoto()}>
+                <Section title="Photos and Videos" label="photo" link="/photos" onRefresh={() => getRandomPhoto()}>
                     <GridList cellHeight={getCellHeight(width)} cols={1}>
                         <GridListTile>
                             <Link to='/photos'>
@@ -107,10 +111,10 @@ export default function Home() {
                         </GridListTile>
                     </GridList>
                 </Section>
-                <Section title="Comments" link="/comments" onRefresh={() => getRandomComment()}>
+                <Section title="Comments" label="comment" link="/comments" onRefresh={() => getRandomComment()}>
                     <Comment {...comment} />
                 </Section>
-                <Section title="Messages" link="/messages" onRefresh={() => getRandomMessages()}>
+                <Section title="Messages" label="message" link="/messages" onRefresh={() => getRandomMessages()}>
                     {messages.map(m => <Message {...m} />)}
                 </Section>
             </Container>

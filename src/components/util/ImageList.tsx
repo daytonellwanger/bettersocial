@@ -7,7 +7,7 @@ import InfiniteScroller, { Fetch } from '../util/InfiniteScroller';
 interface P {
     fetchRequests: Fetch[],
     renderItem: (item: any) => JSX.Element,
-    renderTitle: () => JSX.Element
+    renderTitle?: () => JSX.Element
 }
 
 function useWidth() {
@@ -50,7 +50,7 @@ export default function ImageList(props: P) {
                     fetchRequests={props.fetchRequests}
                     renderItems={(items: any[]) => (
                         <div style={{ overflow: 'hidden' }}>
-                            {props.renderTitle()}
+                            {props.renderTitle ? props.renderTitle() : undefined}
                             <GridList cellHeight={250} cols={columns}>
                                 {items.map(item => props.renderItem(item))}
                             </GridList>

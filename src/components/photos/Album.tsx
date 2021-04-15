@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { GridListTile, GridListTileBar, ListSubheader } from '@material-ui/core';
+import { Button, GridListTile, GridListTileBar, Link, ListSubheader, Tooltip } from '@material-ui/core';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import driveClient, { getPhotoData } from '../../DriveClient';
 import { decodeString, getTimeString } from '../../util';
 import { Album as AlbumData, Photo as PhotoData } from '../../contracts/photos';
@@ -56,5 +57,11 @@ export default function Album(props: P) {
     return <ImageList
         fetchRequests={[() => fetchPhotos()]}
         renderItem={(photo: PhotoData) => renderPhoto(photo)}
-        renderTitle={() => <ListSubheader component="a" href={folderLink} target="_blank" rel="noopener noreferrer">{decodeString(props.location.state.name)}</ListSubheader>} />;
+        renderTitle={() => (
+            <Tooltip title="View on Google Drive">
+                <a rel="noopener noreferrer" href={folderLink} target="_blank">
+                    <Button color="secondary" style={{ marginTop: '1em', marginBottom: '1em' }} endIcon={<OpenInNewIcon />}>{decodeString(props.location.state.name)}</Button>
+                </a>
+            </Tooltip>
+        )} />;
 }
