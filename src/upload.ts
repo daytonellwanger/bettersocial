@@ -101,7 +101,11 @@ export class Uploader {
         const uploadResults = await Promise.all(uploadPromises);
         this.failedUploads = [];
         uploadResults.filter(result => !!result).forEach(result => this.failedUploads = this.failedUploads.concat(result!));
-        return this.failedUploads.length === 0;
+        if (this.failedUploads.length > 0) {
+            return false;
+        }
+        await this.finishUpload();
+        return true;
     }
 
     public async finishUpload() {
