@@ -1,21 +1,24 @@
-async function executeWithExponentialBackoff(executeRequest: () => Promise<any>, delay = 1000, attemptNumber = 1): Promise<any> {
-    if (attemptNumber === 6) {
-        throw new Error('Could not upload'); 
-    }
-    let didThrow = false;
+async function executeWithExponentialBackoff(executeRequest: () => Promise<any>, delay = 1000, attemptNumber = 1): Promise<any> {  
     let result: any;
+    let error: any;
+
     try {
         result = await executeRequest();
-    } catch {
-        didThrow = true;
+    } catch (e) {
+        error = e;
     }
-    if (didThrow || (typeof result.status === 'number' && result.status !== 200)) {
+
+    if (error || (typeof result.status === 'number' && result.status >= 400)) {
+        attemptNumber++;
+        if (attemptNumber === 8) {
+            throw error || (new Error(result.toString()));
+        }
+
         await new Promise<void>((resolve, reject) => {
             setTimeout(() => resolve(), delay);
         });
-        attemptNumber++;
-        delay = 2*delay;
-        return executeWithExponentialBackoff(executeRequest, delay, attemptNumber);
+
+        return executeWithExponentialBackoff(executeRequest, 2*delay, attemptNumber);
     } else {
         return result;
     }
@@ -23,7 +26,8 @@ async function executeWithExponentialBackoff(executeRequest: () => Promise<any>,
 
 type PendingRequest = {
     executeRequest: () => Promise<any>,
-    resolveResult: (result: any) => void
+    resolveResult: (result: any) => void,
+    rejectRequest: (reason?: any) => void
 };
 
 class RequestQueue {
@@ -41,12 +45,15 @@ class RequestQueue {
             return result;
         } else {
             let resolveResult: (result: any) => void;
+            let rejectRequest: (reason?: any) => void;
             const result = new Promise<any>((resolve, reject) => {
                 resolveResult = resolve;
+                rejectRequest = reject;
             });
             const pendingRequest: PendingRequest = {
                 executeRequest,
-                resolveResult: resolveResult!
+                resolveResult: resolveResult!,
+                rejectRequest: rejectRequest!
             }
             this.pendingRequests.push(pendingRequest);
             return result;
@@ -58,8 +65,12 @@ class RequestQueue {
             return;
         }
         const nextRequest = this.pendingRequests.splice(0, 1)[0];
-        const result = await this.request(nextRequest.executeRequest);
-        nextRequest.resolveResult(result);
+        try {
+            const result = await this.request(nextRequest.executeRequest);
+            nextRequest.resolveResult(result);
+        } catch (e) {
+            nextRequest.rejectRequest(e);
+        }
     }
 
 }

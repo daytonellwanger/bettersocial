@@ -21,7 +21,12 @@ export async function uploadFiles(zip: JSZip, uploadListener: (progress: number,
     });
     totalFiles = rootFolder.getNumFiles();
     uploadListener(0, `Uploading files: 1/${totalFiles}`);
-    await rootFolder.upload();
+    const failedUploads = await rootFolder.upload();
+    if (failedUploads.length > 0) {
+        // Upload failed flow - show user failed files and reasons,
+        // prompt if they want to skip or try again  
+        // Also include an option for filing an issue
+    }
     uploadListener(.97, 'Creating conversation index');
     await createConversationIndex(rootFolder);
     uploadListener(.99, 'Creating album index');
@@ -109,25 +114,43 @@ class Folder {
             this.uploadListener();
         }
         this.id = result.id!;
-        const uploadPromises: Promise<void>[] = [];
+        const uploadPromises: Promise<any>[] = [];
+        let failedUploads: FileUploadFailure[] = [];
         for (let childFolder of this.folders) {
-            uploadPromises.push(childFolder.upload(this.id));
+            uploadPromises.push(childFolder.upload(this.id).then((failures) => failedUploads = failedUploads.concat(failures)));
         }
-        const uploadFileFunction = async (file: { id?: string, name: string, zip: JSZip.JSZipObject }, parentId: string) => {
-            const content = await file.zip.async('blob');
-            const result = await uploadFile(file.name, parentId, content);
-            file.id = result.response.id;
-            if (this.uploadListener) {
-                this.uploadListener();
+
+        const uploadFileFunction = async (data: FileData) => {
+            const content = await data.file.zip.async('blob');
+            try {
+                const result = await uploadFile(data.file.name, data.parentId, content);
+                data.file.id = result.response.id;
+                if (this.uploadListener) {
+                    this.uploadListener();
+                }
+            } catch (e) {
+                failedUploads.push({ ...data, failureReason: e });
             }
         };
         for (let file of this.files) {
-            uploadPromises.push(uploadFileFunction(file, this.id));
+            uploadPromises.push(uploadFileFunction({ file, parentId: this.id }));
         }
         await Promise.all(uploadPromises);
+        return failedUploads;
     }
 
 }
+
+type FileData = {
+    file: {
+        id?: string,
+        name: string,
+        zip: JSZip.JSZipObject
+    },
+    parentId: string
+};
+
+type FileUploadFailure = FileData & { failureReason: any };
 
 async function createAlbumIndex(root: Folder) {
     const albumIndex: AlbumIndex = {
