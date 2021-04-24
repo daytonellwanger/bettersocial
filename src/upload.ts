@@ -23,9 +23,7 @@ export async function uploadFiles(zip: JSZip, uploadListener: (progress: number,
     uploadListener(0, `Uploading files: 1/${totalFiles}`);
     const failedUploads = await rootFolder.upload();
     if (failedUploads.length > 0) {
-        // Upload failed flow - show user failed files and reasons,
-        // prompt if they want to skip or try again  
-        // Also include an option for filing an issue
+        return failedUploads;
     }
     uploadListener(.97, 'Creating conversation index');
     await createConversationIndex(rootFolder);
@@ -150,7 +148,7 @@ type FileData = {
     parentId: string
 };
 
-type FileUploadFailure = FileData & { failureReason: any };
+export type FileUploadFailure = FileData & { failureReason: any };
 
 async function createAlbumIndex(root: Folder) {
     const albumIndex: AlbumIndex = {

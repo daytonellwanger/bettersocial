@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, Container, LinearProgress, Typography } from '@material-ui/core';
+import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, Typography } from '@material-ui/core';
 import CSS from 'csstype';
 import JSZip from 'jszip';
-import { uploadFiles } from '../upload';
+import { FileUploadFailure, uploadFiles } from '../upload';
 import YourInfo from './YourInfo';
 
 interface P {
@@ -15,6 +15,7 @@ interface S {
     message: string;
     itemOverDropZone: boolean;
     zip?: JSZip;
+    failedUploads?: FileUploadFailure[];
 }
 
 export default class Upload extends React.Component<P, S> {
@@ -32,11 +33,31 @@ export default class Upload extends React.Component<P, S> {
         if (this.state.uploading) {
             return (
                 <Container maxWidth="md" style={{ padding: '2em' }}>
-                    <LinearProgress variant="determinate" color="secondary" value={this.state.progress*100} style={{ marginBottom: '.5em' }} />
+                    <LinearProgress variant="determinate" color="secondary" value={this.state.progress * 100} style={{ marginBottom: '.5em' }} />
                     <Typography variant="caption" color="secondary">{this.state.message}</Typography>
                     {this.state.zip ? <YourInfo zip={this.state.zip} /> : undefined}
+                    <Dialog
+                        open={!!this.state.failedUploads}
+                        onClose={() => this.setState({ failedUploads: undefined })}
+                    >
+                        <DialogTitle>Upload failed</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>The following files failed to upload:</DialogContentText>
+                            {this.state.failedUploads?.map(f => (
+                                <div>
+                                    <DialogContentText>{f.file.name}</DialogContentText>
+                                    <DialogContentText variant="caption">{f.failureReason.toString()}</DialogContentText>
+                                </div>
+                            ))}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => this.setState({ failedUploads: undefined })} color="secondary">Report</Button>
+                            <Button onClick={() => this.setState({ failedUploads: undefined })} color="secondary">Retry</Button>
+                            <Button onClick={() => this.setState({ failedUploads: undefined })} color="secondary" autoFocus>Skip</Button>
+                        </DialogActions>
+                    </Dialog>
                 </Container>
-            )
+            );
         } else {
             return (
                 <Container style={{ padding: '2em' }} maxWidth="sm">
@@ -110,8 +131,12 @@ export default class Upload extends React.Component<P, S> {
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zip = await JSZip.loadAsync(file!);
         this.setState({ zip });
-        await uploadFiles(zip, (progress, message) => this.setState({ progress, message }));
-        this.props.onUploadComplete();
+        const failedUploads = await uploadFiles(zip, (progress, message) => this.setState({ progress, message }));
+        if (failedUploads) {
+            this.setState({ failedUploads });
+        } else {
+            this.props.onUploadComplete();
+        }
     }
 
 }
