@@ -37,6 +37,7 @@ export default class Upload extends React.Component<P, S> {
                 <Container maxWidth="md" style={{ padding: '2em' }}>
                     <LinearProgress variant="determinate" color="secondary" value={this.state.progress * 100} style={{ marginBottom: '.5em' }} />
                     <Typography variant="caption" color="secondary">{this.state.message}</Typography>
+                    <Typography variant="body1" color="secondary" style={{ marginTop: '1em', marginBottom: '1em' }}>This may take a while. You can go do something else, but make sure to keep this tab open until the upload completes.</Typography>
                     {this.state.zip ? <YourInfo zip={this.state.zip} /> : undefined}
                     <Dialog open={this.state.uploadFailed}>
                         <DialogTitle>Upload failed</DialogTitle>
