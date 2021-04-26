@@ -16,6 +16,7 @@ interface S {
     message: string;
     itemOverDropZone: boolean;
     zip?: JSZip;
+    invalidInput: boolean;
     uploadFailed: boolean;
 }
 
@@ -26,6 +27,7 @@ export default class Upload extends React.Component<P, S> {
         progress: 0,
         message: '',
         itemOverDropZone: false,
+        invalidInput: false,
         uploadFailed: false
     };
 
@@ -131,6 +133,15 @@ export default class Upload extends React.Component<P, S> {
                             <Typography><Link href="https://www.google.com/drive/terms-of-service/" target="_blank" color="secondary">Google Drive's Terms of Service</Link> state that "your content remains yours." In addition, according to <Link href="https://policies.google.com/privacy" target="_blank" color="secondary">Google's Privacy Policy</Link>, your data is not shared with anyone else except your domain administrator, in the case that you have an organizational account, or in the case of legal matters.</Typography>
                         </AccordionDetails>
                     </Accordion>
+                    <Dialog open={this.state.invalidInput} onClose={() => this.setState({ invalidInput: false })}>
+                        <DialogTitle>Invalid input</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>Looks like you didn't upload valid Facebook data. Make sure you've selected the .zip file you got from <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link>, and make sure you set "Format" to "JSON" when requesting your data. See "How to get your data from Facebook" below.</DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button component={Link} href="https://www.socialfreedom.life/complain" target="_blank" color="secondary" onClick={() => this.setState({ invalidInput: false })}>Report an issue</Button>
+                        </DialogActions>
+                    </Dialog>
                 </Container>
             );
         }
@@ -173,6 +184,11 @@ export default class Upload extends React.Component<P, S> {
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zip = await JSZip.loadAsync(file!);
         this.uploader = new Uploader(zip, (progress, message) => this.setState({ progress, message }));
+        const validInput = this.uploader.preUpload();
+        if (!validInput) {
+            this.setState({ uploading: false, progress: 0, message: '', invalidInput: true });
+            return;
+        }
         this.setState({ zip });
         const uploadSuccessful = await this.uploader.upload();
         if (uploadSuccessful) {

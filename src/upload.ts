@@ -78,13 +78,22 @@ export class Uploader {
         this.rootFolder = new Folder(mainFolderName, ['posts', 'comments', 'messages', 'photos_and_videos'], this.fileUploadListener);
     }
 
-    public async upload(): Promise<boolean> {
+    public preUpload(): boolean {
+        const requiredFiles = ['posts/your_posts_1.json', 'comments/comments.json', 'photos_and_videos/album/0.json'];
+        let hadRequiredFile = false;
         this.zip.forEach((relativePath, file) => {
             if (file.dir) {
                 return;
             }
+            if (requiredFiles.indexOf(relativePath) >= 0) {
+                hadRequiredFile = true;
+            }
             this.rootFolder!.addFile(relativePath, file, false);
         });
+        return hadRequiredFile;
+    }
+
+    public async upload(): Promise<boolean> {
         this.totalFiles = this.rootFolder!.getNumFiles();
         this.uploadListener(0, `Uploading files: 1/${this.totalFiles}`);
         this.failedUploads = await this.rootFolder.upload();
