@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, Link, Typography } from '@material-ui/core';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, Link, Typography } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CSS from 'csstype';
 import JSZip from 'jszip';
 import { Uploader } from '../upload';
@@ -101,6 +102,35 @@ export default class Upload extends React.Component<P, S> {
                             ref={ref => this.inputRef = ref}
                         />
                     </Button>
+                    <Accordion style={{ marginTop: '1.5em' }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography>How to get your data from Facebook</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em' }}>
+                            <Typography>• Go to <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link></Typography>
+                            <Typography>• Set Format to JSON</Typography>
+                            <Typography>• Click "Create File"</Typography>
+                            <Typography>• Wait for Facebook to notify you that your data is ready</Typography>
+                            <Typography>• Download the .zip file</Typography>
+                            <Typography>• Drag and drop it here</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography>What we do with your data</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails style={{ marginLeft: '1em', marginRight: '1em' }}>
+                            <Typography>Nothing! We upload <Box fontWeight="500" display='inline'>your</Box> data to <Box fontWeight="500" display='inline'>your</Box> Google Drive. We have no servers of our own. When you visit this site, we read the data from your Google Drive and render it in your browser. It never goes anywhere else. See below for the promises Google makes regarding your data privacy.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography>Google's privacy policy</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails style={{ marginLeft: '1em', marginRight: '1em' }}>
+                            <Typography><Link href="https://www.google.com/drive/terms-of-service/" target="_blank" color="secondary">Google Drive's Terms of Service</Link> state that "your content remains yours." In addition, according to <Link href="https://policies.google.com/privacy" target="_blank" color="secondary">Google's Privacy Policy</Link>, your data is not shared with anyone else except your domain administrator, in the case that you have an organizational account, or in the case of legal matters.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
                 </Container>
             );
         }
