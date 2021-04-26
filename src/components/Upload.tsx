@@ -110,7 +110,7 @@ export default class Upload extends React.Component<P, S> {
                         </AccordionSummary>
                         <AccordionDetails style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em' }}>
                             <Typography>• Go to <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link></Typography>
-                            <Typography>• Set Format to JSON</Typography>
+                            <Typography>• Set <Box fontWeight="500" display='inline'>Format</Box> to <Box fontWeight="500" display='inline'>JSON</Box></Typography>
                             <Typography>• Click "Create File"</Typography>
                             <Typography>• Wait for Facebook to notify you that your data is ready</Typography>
                             <Typography>• Download the .zip file</Typography>
@@ -136,7 +136,7 @@ export default class Upload extends React.Component<P, S> {
                     <Dialog open={this.state.invalidInput} onClose={() => this.setState({ invalidInput: false })}>
                         <DialogTitle>Invalid input</DialogTitle>
                         <DialogContent>
-                            <DialogContentText>Looks like you didn't upload valid Facebook data. Make sure you've selected the .zip file you got from <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link>, and make sure you set "Format" to "JSON" when requesting your data. See "How to get your data from Facebook" below.</DialogContentText>
+                            <DialogContentText>Looks like you didn't upload valid Facebook data. Make sure you've selected the .zip file you got from <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link>, and make sure you set <Box fontWeight="500" display='inline'>Format</Box> to <Box fontWeight="500" display='inline'>JSON</Box> when requesting your data. See "How to get your data from Facebook" below.</DialogContentText>
                         </DialogContent>
                         <DialogActions>
                             <Button component={Link} href="https://www.socialfreedom.life/complain" target="_blank" color="secondary" onClick={() => this.setState({ invalidInput: false })}>Report an issue</Button>
