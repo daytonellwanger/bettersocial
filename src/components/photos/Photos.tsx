@@ -29,6 +29,7 @@ export default function Photos() {
                         const videoAlbum = await getVideosAlbum();
                         albums.push(videoAlbum);
                     } catch {}
+                    albums.sort((a, b) => b.timestamp - a.timestamp);
                     return albums;
                 }]}
                 renderItem={(album: AlbumIndexEntry) => renderAlbum(album)} />;

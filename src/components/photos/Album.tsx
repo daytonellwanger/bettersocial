@@ -21,12 +21,13 @@ export default function Album(props: P) {
     const [folderLink, setFolderLink] = useState<string | undefined>(undefined);
 
     async function fetchPhotos() {
+        let album: AlbumData;
         if (props.location.state.id === 'videos') {
             const videos = await driveClient.getVideos();
-            const album: AlbumData = {
+            album = {
                 cover_photo: {} as any,
                 description: '',
-                last_modified_timestamp: 0,
+                last_modified_timestamp: -1,
                 name: 'Videos',
                 photos: videos.videos.map(v => ({
                     ...v,
@@ -34,13 +35,13 @@ export default function Album(props: P) {
                 }))
             };
             setFolderLink(videos.videosFolderLink);
-            return album.photos;
         } else {
-            const album: AlbumData = (await gapi.client.drive.files.get({ fileId: props.location.state.id, alt: 'media' })).result as AlbumData;
+            album = (await gapi.client.drive.files.get({ fileId: props.location.state.id, alt: 'media' })).result as AlbumData;
             const folderLink = (await getPhotoData(album.cover_photo.uri, true))?.parentFolderLink!;
             setFolderLink(folderLink);
-            return album.photos;
         }
+        album.photos.sort((a, b) => b.creation_timestamp - a.creation_timestamp);
+        return album.photos;
     }
 
     function renderPhoto(photo: PhotoData) {
