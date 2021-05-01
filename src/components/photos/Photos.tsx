@@ -41,7 +41,7 @@ async function getVideosAlbum() {
         name: 'Videos',
         numPhotos: videos.videos.length,
         photo: videos.videos[0].uri,
-        timestamp: 0
+        timestamp: Math.max(-1, ...videos.videos.map(v => v.creation_timestamp))
     };
     return album;
 }
