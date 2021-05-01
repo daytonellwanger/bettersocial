@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Typography } from '@material-ui/core';
+import { Tooltip, Typography } from '@material-ui/core';
+import InfoIcon from '@material-ui/icons/Info';
 import JSZip from 'jszip';
 import Ticker from 'react-ticker'
 import { decodeString, getTimeString } from '../util';
@@ -96,7 +97,12 @@ export default function YourInfo(props: P) {
         if (contactList.length > 0) {
             return (
                 <div style={{ marginTop: '3em' }}>
-                    <Typography variant="body2" color="secondary" style={{ marginBottom: '1em' }}>Advertisers who uploaded a contact list with your information to Facebook: {contactList.length}</Typography>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '1em' }}>
+                        <Typography variant="body2" color="secondary">Advertisers who uploaded a contact list with your information to Facebook: {contactList.length}</Typography>
+                        <Tooltip title="Advertisers can upload lists of email addresses to Facebook to help with targeting ads. These advertisers uploaded a list that contained your email address.">
+                            <InfoIcon color="secondary" fontSize="small" style={{ marginLeft: '.2em' }} />
+                        </Tooltip>
+                    </div>
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
@@ -113,7 +119,12 @@ export default function YourInfo(props: P) {
         if (offFacebookActivity.length > 0) {
             return (
                 <div style={{ marginTop: '3em' }}>
-                    <Typography variant="body2" color="secondary" style={{ marginBottom: '1em' }}>Sites that reported your activities to Facebook: {offFacebookActivity.length}</Typography>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '1em' }}>
+                        <Typography variant="body2" color="secondary">Sites that reported your activities to Facebook: {offFacebookActivity.length}</Typography>
+                        <Tooltip title="Sites report your activity to Facebook to track the effectiveness of their ads. These sites reported your activity to Facebook.">
+                            <InfoIcon color="secondary" fontSize="small" style={{ marginLeft: '.2em' }} />
+                        </Tooltip>
+                    </div>
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
@@ -138,7 +149,12 @@ export default function YourInfo(props: P) {
         if (Object.keys(locations).length > 0) {
             return (
                 <div style={{ marginTop: '3em' }}>
-                    <Typography variant="body2" color="secondary" style={{ marginBottom: '1em' }}>Locations and times when you interacted with Facebook</Typography>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '1em' }}>
+                        <Typography variant="body2" color="secondary">Locations and times when you interacted with Facebook</Typography>
+                        <Tooltip title="Facebook stores the time of your logins and the IP address of the device that you logged in from, which can be mapped to a geographical location with decent accuracy.">
+                            <InfoIcon color="secondary" fontSize="small" style={{ marginLeft: '.2em' }} />
+                        </Tooltip>
+                    </div>
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
@@ -155,7 +171,12 @@ export default function YourInfo(props: P) {
         if (searches.length > 0) {
             return (
                 <div style={{ marginTop: '3em' }}>
-                    <Typography variant="body2" color="secondary" style={{ marginBottom: '1em' }}>Your searches</Typography>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '1em' }}>
+                        <Typography variant="body2" color="secondary">Your searches</Typography>
+                        <Tooltip title="Facebook stores the text and time of all queries you enter in the search bar.">
+                            <InfoIcon color="secondary" fontSize="small" style={{ marginLeft: '.2em' }} />
+                        </Tooltip>
+                    </div>
                     <Ticker>
                         {({ index }) => (
                             <div style={{ marginRight: '3em' }}>
