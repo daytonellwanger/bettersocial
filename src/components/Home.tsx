@@ -60,9 +60,9 @@ function getCellHeight(width: Breakpoint) {
 export default function Home() {
 
     const now = (new Date()).getTime();
-    const [post, setPost] = useState<PostData>({ timestamp: now });
-    const [photo, setPhoto] = useState<PhotoData>({ title: '', uri: undefined as any, creation_timestamp: now });
-    const [comment, setComment] = useState<CommentData>({ title: '', timestamp: now });
+    const [post, setPost] = useState<PostData>({ timestamp: -1 });
+    const [photo, setPhoto] = useState<PhotoData>({ title: '', uri: undefined as any, creation_timestamp: -1 });
+    const [comment, setComment] = useState<CommentData>({ title: '', timestamp: -1 });
     const [messages, setMessages] = useState<MessagePlus[]>([]);
     const width = useWidth();
 
