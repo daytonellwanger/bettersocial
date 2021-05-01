@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography } from '@material-ui/core';
+import { Container, Link, Typography } from '@material-ui/core';
 import Main from './Main';
 
 interface S {
@@ -18,9 +18,13 @@ export default class ErrorHandler extends React.Component<{}, S> {
     render() {
         if (this.state.error) {
             return (
-                <Container>
-                    <Typography variant="h4" color="secondary">{this.state.error.toString()}</Typography>
-                    <Typography variant="caption" color="secondary">{this.state.error.stack}</Typography>
+                <Container style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                    <div>
+                        <Typography variant="h4" color="secondary" style={{ marginBottom: '1em' }}>Whoops! Something went wrong. <Link href="https://www.socialfreedom.life/complain" target="_blank" underline="always">Report an issue</Link>.</Typography>
+                        <Typography variant="caption" color="secondary" style={{ marginBottom: '.5em' }}>Details:</Typography>
+                        <Typography variant="h4" color="secondary">{this.state.error.toString()}</Typography>
+                        <Typography variant="caption" color="secondary">{this.state.error.stack}</Typography>
+                    </div>
                 </Container>
             );
         } else {
