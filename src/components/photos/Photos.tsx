@@ -1,5 +1,5 @@
 import React from 'react';
-import { GridListTile, GridListTileBar, ListSubheader } from '@material-ui/core';
+import { GridListTile, GridListTileBar } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { decodeString, getTimeString } from '../../util';
 import driveClient from '../../DriveClient';

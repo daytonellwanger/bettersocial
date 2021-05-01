@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, GridListTile, GridListTileBar, Link, ListSubheader, Tooltip } from '@material-ui/core';
+import { Button, GridListTile, GridListTileBar, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import driveClient, { getPhotoData } from '../../DriveClient';
 import { decodeString, getTimeString } from '../../util';
