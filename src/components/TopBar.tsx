@@ -30,7 +30,7 @@ export default function TopBar(props: P) {
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
-                    <MenuItem onClick={() => setIsMenuOpen(false)}>Fund</MenuItem>
+                    <MenuItem onClick={() => { window.open('https://www.buymeacoffee.com/socialfreedom', '_blank'); setIsMenuOpen(false); }}>Fund</MenuItem>
                     <MenuItem onClick={() => { window.open('https://www.socialfreedom.life/complain', '_blank'); setIsMenuOpen(false); }}>Complain</MenuItem>
                     <MenuItem onClick={() => { window.open('https://www.socialfreedom.life/contact', '_blank'); setIsMenuOpen(false); }}>Contact</MenuItem>
                     <MenuItem onClick={() => { props.signOut(); setIsMenuOpen(false); }}>Logout</MenuItem>
