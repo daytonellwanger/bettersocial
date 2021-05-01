@@ -26,4 +26,3 @@ export default function MainContainer(props: P) {
 const useStyles = makeStyles((theme) => ({
     toolbar: theme.mixins.toolbar
 }));
-
