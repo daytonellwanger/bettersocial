@@ -54,7 +54,8 @@ class DriveClient {
                 if (!file.id) {
                     continue;
                 }
-                const partialPosts = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as PostWithAttachment[];
+                const gapiSelf = gapi;
+                const partialPosts = (await requestQueue.request(() => gapiSelf.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as PostWithAttachment[];
                 posts.push(...partialPosts);
             }
             resolve(posts);
@@ -68,7 +69,8 @@ class DriveClient {
                 if (!file.id) {
                     continue;
                 }
-                const partialComments = ((await requestQueue.request(() => gapi.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as any).comments as Comment[];
+                const gapiSelf = gapi;
+                const partialComments = ((await requestQueue.request(() => gapiSelf.client.drive.files.get({ fileId: file.id!, alt: 'media' }))).result as any).comments as Comment[];
                 comments.push(...partialComments);
             }
             resolve(comments);

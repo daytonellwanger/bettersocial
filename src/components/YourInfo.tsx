@@ -91,6 +91,7 @@ export default function YourInfo(props: P) {
         getOffFacebookActivity();
         getLocations();
         getSearches();
+    // eslint-disable-next-line
     }, []);
 
     function renderContactList() {
