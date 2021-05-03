@@ -130,7 +130,7 @@ export default class Upload extends React.Component<P, S> {
                             <Typography>Google's privacy policy</Typography>
                         </AccordionSummary>
                         <AccordionDetails style={{ marginLeft: '1em', marginRight: '1em' }}>
-                            <Typography><Link href="https://www.google.com/drive/terms-of-service/" target="_blank" color="secondary">Google Drive's Terms of Service</Link> state that "your content remains yours." In addition, according to <Link href="https://policies.google.com/privacy" target="_blank" color="secondary">Google's Privacy Policy</Link>, your data is not shared with anyone else except your domain administrator, in the case that you have an organizational account, or in the case of legal matters.</Typography>
+                            <Typography><Link href="https://www.google.com/drive/terms-of-service/" target="_blank" color="secondary" underline="always">Google Drive's Terms of Service</Link> state that "your content remains yours." In addition, according to <Link href="https://policies.google.com/privacy" target="_blank" color="secondary" underline="always">Google's Privacy Policy</Link>, your data is not shared with anyone else except your domain administrator, in the case that you have an organizational account, or in the case of legal matters.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Dialog open={this.state.invalidInput} onClose={() => this.setState({ invalidInput: false })}>
