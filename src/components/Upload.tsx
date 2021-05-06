@@ -54,7 +54,7 @@ export default class Upload extends React.Component<P, S> {
                             ))}
                         </DialogContent>
                         <DialogActions>
-                            <Button component={Link} href="https://www.socialfreedom.life/complain" target="_blank" color="secondary">Report</Button>
+                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary">Report</Button>
                             <Button onClick={async () => {
                                 this.setState({ uploadFailed: false });
                                 const uploadSuccess = await this.uploader!.retryFailedFiles();
@@ -109,7 +109,7 @@ export default class Upload extends React.Component<P, S> {
                             <Typography>How to get your data from Facebook</Typography>
                         </AccordionSummary>
                         <AccordionDetails style={{ display: 'flex', flexDirection: 'column', marginLeft: '1em', marginRight: '1em' }}>
-                            <Typography>• Go to <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link></Typography>
+                            <Typography>• Go to <Link href="https://facebook.com/dyi/" target="_blank" color="secondary" underline="always">facebook.com/dyi</Link></Typography>
                             <Typography>• Set <Box fontWeight="500" display='inline'>Format</Box> to <Box fontWeight="500" display='inline'>JSON</Box></Typography>
                             <Typography>• Click "Create File"</Typography>
                             <Typography>• Wait for Facebook to notify you that your data is ready</Typography>
@@ -122,7 +122,7 @@ export default class Upload extends React.Component<P, S> {
                             <Typography>What we do with your data</Typography>
                         </AccordionSummary>
                         <AccordionDetails style={{ marginLeft: '1em', marginRight: '1em' }}>
-                            <Typography>Nothing! We upload <Box fontWeight="500" display='inline'>your</Box> data to <Box fontWeight="500" display='inline'>your</Box> Google Drive. We have no servers of our own. When you visit this site, we read the data from your Google Drive and render it in your browser. It never goes anywhere else. See below for the promises Google makes regarding your data privacy.</Typography>
+                            <Typography>Nothing! We upload <Box fontWeight="500" display='inline'>your</Box> data to <Box fontWeight="500" display='inline'>your</Box> Google Drive. We have no servers of our own. When you visit this site, we read the data from your Google Drive and render it in your browser. It never goes anywhere else. You can read more <Link href="https://www.socialfreedom.life/own-your-facebook-data#how-it-works" target="_blank" color="secondary" underline="always">here</Link>. See below for the promises Google makes regarding your data privacy.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion>
