@@ -123,7 +123,7 @@ export default class Upload extends React.Component<P, S> {
                             <Typography>What we do with your data</Typography>
                         </AccordionSummary>
                         <AccordionDetails style={{ marginLeft: '1em', marginRight: '1em' }}>
-                            <Typography>Nothing! We upload <Box fontWeight="500" display='inline'>your</Box> data to <Box fontWeight="500" display='inline'>your</Box> Google Drive. We have no servers of our own. When you visit this site, we read the data from your Google Drive and render it in your browser. It never goes anywhere else. You can read more <Link href="https://www.socialfreedom.life/own-your-facebook-data#how-it-works" target="_blank" color="secondary" underline="always">here</Link>. See below for the promises Google makes regarding your data privacy.</Typography>
+                            <Typography>Nothing! We upload <Box fontWeight="500" display='inline'>your</Box> data to <Box fontWeight="500" display='inline'>your</Box> Google Drive. We have no servers of our own. When you visit this site, we read the data from your Google Drive and render it in your browser. It never goes anywhere else. You can read more <Link href="https://www.socialfreedom.life/mydata#how-it-works" target="_blank" color="secondary" underline="always">here</Link>. See below for the promises Google makes regarding your data privacy.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion>
