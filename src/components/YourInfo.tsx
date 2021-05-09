@@ -6,7 +6,7 @@ import Ticker from 'react-ticker'
 import { decodeString, getTimeString } from '../util';
 
 interface P {
-    zip: JSZip;
+    zips: JSZip[];
 }
 
 type LocationAndTime = {
@@ -25,7 +25,13 @@ export default function YourInfo(props: P) {
     const [searches, setSearches] = useState<string[]>([]);
 
     async function getFileContent(fileName: string): Promise<any> {
-        const file = props.zip.files[fileName];
+        let file: JSZip.JSZipObject | undefined = undefined;
+        for (let zip of props.zips) {
+            file = zip.files[fileName];
+            if (file) {
+                break;
+            }
+        }
         if (!file) {
             return undefined;
         }

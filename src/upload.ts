@@ -69,7 +69,7 @@ export class Uploader {
     private fileUploadListener: () => void;
     public failedUploads: FileUploadFailure[] = [];
 
-    public constructor(private zip: JSZip, private uploadListener: (progress: number, message: string) => void) {
+    public constructor(private zips: JSZip[], private uploadListener: (progress: number, message: string) => void) {
         this.fileUploadListener = () => {
             this.uploadedFiles++;
             const progress = (this.uploadedFiles / this.totalFiles) * .95;
@@ -81,14 +81,16 @@ export class Uploader {
     public preUpload(): boolean {
         const requiredFiles = ['posts/your_posts_1.json', 'comments/comments.json', 'photos_and_videos/album/0.json'];
         let hadRequiredFile = false;
-        this.zip.forEach((relativePath, file) => {
-            if (file.dir) {
-                return;
-            }
-            if (requiredFiles.indexOf(relativePath) >= 0) {
-                hadRequiredFile = true;
-            }
-            this.rootFolder!.addFile(relativePath, file, false);
+        this.zips.forEach((zip) => {
+            zip.forEach((relativePath, file) => {
+                if (file.dir) {
+                    return;
+                }
+                if (requiredFiles.indexOf(relativePath) >= 0) {
+                    hadRequiredFile = true;
+                }
+                this.rootFolder!.addFile(relativePath, file, false);
+            });
         });
         return hadRequiredFile;
     }

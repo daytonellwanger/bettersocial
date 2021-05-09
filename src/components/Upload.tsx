@@ -15,7 +15,7 @@ interface S {
     progress: number;
     message: string;
     itemOverDropZone: boolean;
-    zip?: JSZip;
+    zips?: JSZip[];
     invalidInput: boolean;
     uploadFailed: boolean;
 }
@@ -41,7 +41,7 @@ export default class Upload extends React.Component<P, S> {
                     <LinearProgress variant="determinate" color="secondary" value={this.state.progress * 100} style={{ marginBottom: '.5em' }} />
                     <Typography variant="caption" color="secondary">{this.state.message}</Typography>
                     <Typography variant="body1" color="secondary" style={{ marginTop: '1em', marginBottom: '1em' }}>This may take a while. You can go do something else, but make sure to keep this tab open until the upload completes.</Typography>
-                    {this.state.zip ? <YourInfo zip={this.state.zip} /> : undefined}
+                    {this.state.zips ? <YourInfo zips={this.state.zips} /> : undefined}
                     <Dialog open={this.state.uploadFailed}>
                         <DialogTitle>Upload failed</DialogTitle>
                         <DialogContent>
@@ -99,6 +99,7 @@ export default class Upload extends React.Component<P, S> {
                         <input
                             type="file"
                             hidden
+                            multiple
                             accept=".zip"
                             onChange={() => this.handleFileInput()}
                             ref={ref => this.inputRef = ref}
@@ -139,7 +140,7 @@ export default class Upload extends React.Component<P, S> {
                             <DialogContentText>Looks like you didn't upload valid Facebook data. Make sure you've selected the .zip file you got from <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link>, and make sure you set <Box fontWeight="500" display='inline'>Format</Box> to <Box fontWeight="500" display='inline'>JSON</Box> when requesting your data. See "How to get your data from Facebook" below.</DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button component={Link} href="https://www.socialfreedom.life/complain" target="_blank" color="secondary" onClick={() => this.setState({ invalidInput: false })}>Report an issue</Button>
+                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary" onClick={() => this.setState({ invalidInput: false })}>Report an issue</Button>
                         </DialogActions>
                     </Dialog>
                 </Container>
@@ -149,47 +150,48 @@ export default class Upload extends React.Component<P, S> {
 
     private async handleDropFile(event: React.DragEvent) {
         event.preventDefault();
-        let file: File;
+        const files: File[] = [];
         if (event.dataTransfer.items) {
-            if (event.dataTransfer.items.length > 1) {
-                // complain
+            for (let i = 0; i < event.dataTransfer.items.length; i++) {
+                const item = event.dataTransfer.items[i];
+                if (item.kind !== 'file') {
+                    continue;
+                }
+                files.push(item.getAsFile()!);
             }
-            const item = event.dataTransfer.items[0];
-            if (item.kind !== 'file') {
-                // complain
-            }
-            file = item.getAsFile()!;
         } else {
-            if (event.dataTransfer.files.length > 1) {
-                // complain
+            for (let i = 0; i < event.dataTransfer.files.length; i++) {
+                files.push(event.dataTransfer.files[i]);
             }
-            file = event.dataTransfer.files[0];
         }
-        if (!file) {
-            // complain
-        }
-        await this.uploadFile(file);
+        await this.uploadFile(files);
     }
 
     private async handleFileInput() {
-        const file = this.inputRef?.files?.item(0);
-        if (!file) {
-            // complain
+        const files: File[] = [];
+        if (!this.inputRef?.files) {
             return;
         }
-        await this.uploadFile(file);
+        for (let i = 0; i < this.inputRef.files.length; i++) {
+            files.push(this.inputRef.files[i]);
+        }
+        await this.uploadFile(files);
     }
 
-    private async uploadFile(file: File) {
+    private async uploadFile(files: File[]) {
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
-        const zip = await JSZip.loadAsync(file!);
-        this.uploader = new Uploader(zip, (progress, message) => this.setState({ progress, message }));
+        const zips: JSZip[] = [];
+        for (let f of files) {
+            const zip = await JSZip.loadAsync(f);
+            zips.push(zip);
+        }
+        this.uploader = new Uploader(zips, (progress, message) => this.setState({ progress, message }));
         const validInput = this.uploader.preUpload();
         if (!validInput) {
             this.setState({ uploading: false, progress: 0, message: '', invalidInput: true });
             return;
         }
-        this.setState({ zip });
+        this.setState({ zips });
         const uploadSuccessful = await this.uploader.upload();
         if (uploadSuccessful) {
             this.props.onUploadComplete();
