@@ -60,7 +60,7 @@ function getCellHeight(width: Breakpoint) {
 export default function Home() {
 
     const [post, setPost] = useState<PostData>({ timestamp: -1 });
-    const [photo, setPhoto] = useState<PhotoData>({ title: '', uri: undefined as any, creation_timestamp: -1 });
+    const [photo, setPhoto] = useState<PhotoData | undefined>({ title: '', uri: undefined as any, creation_timestamp: -1 });
     const [comment, setComment] = useState<CommentData>({ title: '', timestamp: -1 });
     const [messages, setMessages] = useState<MessagePlus[]>([]);
     const width = useWidth();
@@ -102,11 +102,11 @@ export default function Home() {
                     <GridList cellHeight={getCellHeight(width)} cols={1}>
                         <GridListTile>
                             <Link to='/photos'>
-                                {photo.uri ? <Image uri={photo.uri} /> : undefined}
+                                {photo?.uri ? <Image uri={photo.uri} /> : undefined}
                             </Link>
                             <GridListTileBar
-                                title={decodeString(photo.description || '')}
-                                subtitle={getTimeString(photo.creation_timestamp)} />
+                                title={decodeString(photo?.description || '')}
+                                subtitle={getTimeString(photo?.creation_timestamp || -1)} />
                         </GridListTile>
                     </GridList>
                 </Section>

@@ -183,10 +183,18 @@ class DriveClient {
         return albums;
     }
 
-    public async getRandomPhoto(): Promise<Photo> {
+    public async getRandomPhoto(attempts = 0): Promise<Photo | undefined> {
         const albums = await this.getAlbumFiles();
         const randomAlbumId = albums[Math.floor(Math.random() * albums.length)].id;
         const randomAlbum = (await requestQueue.request(() => gapi.client.drive.files.get({ fileId: randomAlbumId, alt: 'media' }))).result as Album;
+
+        if (randomAlbum.photos.length === 0) {
+            if (attempts > 100) {
+                return undefined;
+            }
+            return this.getRandomPhoto(attempts + 1);
+        }
+
         const randomPhoto = randomAlbum.photos[Math.floor(Math.random() * randomAlbum.photos.length)];
         return randomPhoto;
     }
