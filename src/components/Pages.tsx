@@ -7,10 +7,12 @@ import { P as InfiniteScrollerProps } from './util/InfiniteScroller';
 import driveClient from '../DriveClient';
 
 export interface Page {
+    name: string;
     data: InfiniteScrollerProps;
 }
 
 export const posts: Page = {
+    name: 'Posts',
     data: {
         fetchRequests: [() => driveClient.getPosts()],
         pageSize: 25,
@@ -19,6 +21,7 @@ export const posts: Page = {
 };
 
 export const comments: Page = {
+    name: 'Comments',
     data: {
         fetchRequests: [() => driveClient.getComments()],
         pageSize: 25,

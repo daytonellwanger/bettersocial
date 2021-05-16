@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Link, Typography } from '@material-ui/core';
+import { appInsights } from '../AppInsights';
 import Main from './Main';
 
 interface S {
@@ -17,6 +18,7 @@ export default class ErrorHandler extends React.Component<{}, S> {
 
     render() {
         if (this.state.error) {
+            appInsights.trackException({ exception: this.state.error });
             return (
                 <Container style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
                     <div>

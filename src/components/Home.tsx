@@ -4,6 +4,7 @@ import { Button, Container, GridList, GridListTile, GridListTileBar, IconButton,
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import RefreshIcon from '@material-ui/icons/Refresh';
+import { useAppInsightsContext, useTrackEvent, useTrackMetric } from '@microsoft/applicationinsights-react-js';
 import driveClient from '../DriveClient';
 import { decodeString, getTimeString } from '../util';
 import { Post as PostData } from '../contracts/posts';
@@ -59,6 +60,14 @@ function getCellHeight(width: Breakpoint) {
 
 export default function Home() {
 
+    const appInsights = useAppInsightsContext();
+    const trackComponent = useTrackMetric(appInsights, 'Home');
+    trackComponent();
+    const trackGetRandomPost = useTrackEvent<any>(appInsights, 'GetRandomPost', {});
+    const trackGetRandomPhoto = useTrackEvent<any>(appInsights, 'GetRandomPhoto', {});
+    const trackGetRandomComment = useTrackEvent<any>(appInsights, 'GetRandomComment', {});
+    const trackGetRandomMessage = useTrackEvent<any>(appInsights, 'GetRandomMessage', {});
+
     const [post, setPost] = useState<PostData>({ timestamp: -1 });
     const [photo, setPhoto] = useState<PhotoData | undefined>({ title: '', uri: undefined as any, creation_timestamp: -1 });
     const [comment, setComment] = useState<CommentData>({ title: '', timestamp: -1 });
@@ -95,10 +104,10 @@ export default function Home() {
     return (
         <div style={{ height: '100%', overflowY: 'scroll' }}>
             <Container style={{ paddingTop: '1em', paddingLeft: '.4em', paddingRight: '.4em' }}>
-                <Section title="Posts" label="post" link="/posts" onRefresh={() => getRandomPost()}>
+                <Section title="Posts" label="post" link="/posts" onRefresh={() => { trackGetRandomPost({}); getRandomPost(); }}>
                     <Post {...post} />
                 </Section>
-                <Section title="Photos and Videos" label="photo" link="/photos" onRefresh={() => getRandomPhoto()}>
+                <Section title="Photos and Videos" label="photo" link="/photos" onRefresh={() => { trackGetRandomPhoto({}); getRandomPhoto(); }}>
                     <GridList cellHeight={getCellHeight(width)} cols={1}>
                         <GridListTile>
                             <Link to='/photos'>
@@ -110,10 +119,10 @@ export default function Home() {
                         </GridListTile>
                     </GridList>
                 </Section>
-                <Section title="Comments" label="comment" link="/comments" onRefresh={() => getRandomComment()}>
+                <Section title="Comments" label="comment" link="/comments" onRefresh={() => { trackGetRandomComment({}); getRandomComment(); }}>
                     <Comment {...comment} />
                 </Section>
-                <Section title="Messages" label="message" link="/messages" onRefresh={() => getRandomMessages()}>
+                <Section title="Messages" label="message" link="/messages" onRefresh={() => { trackGetRandomMessage({}); getRandomMessages(); }}>
                     {messages.map(m => <Message {...m} />)}
                 </Section>
             </Container>

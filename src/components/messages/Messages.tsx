@@ -4,6 +4,7 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { useAppInsightsContext, useTrackEvent, useTrackMetric } from '@microsoft/applicationinsights-react-js';
 import { decodeString } from '../../util';
 import driveClient from '../../DriveClient';
 import { ConversationFolder } from '../../contracts/messages';
@@ -35,6 +36,11 @@ function isFull(width: Breakpoint) {
 
 export default function Messages() {
 
+    const appInsights = useAppInsightsContext();
+    const trackComponent = useTrackMetric(appInsights, 'Messages');
+    trackComponent();
+    const trackSelectConversation = useTrackEvent<any>(appInsights, 'SelectConversation', {});
+
     const [conversations, setConversations] = useState<ConversationFolder[]>([]);
     const [selectedConversation, setSelectedConversation] = useState<ConversationFolder | undefined>();
     const [listOpen, setListOpen] = useState<boolean>(true);
@@ -55,7 +61,7 @@ export default function Messages() {
         const { index, style } = props;
         const conversation = conversations[index];
         return (
-            <ListItem button divider key={index} style={style} onClick={() => { setSelectedConversation(conversation); setListOpen(false); }}>
+            <ListItem button divider key={index} style={style} onClick={() => { trackSelectConversation({}); setSelectedConversation(conversation); setListOpen(false); }}>
                 <Typography noWrap variant="button" color="secondary">{decodeString(conversation.name)}</Typography>
             </ListItem>
         );

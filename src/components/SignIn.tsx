@@ -2,12 +2,14 @@ import React from 'react';
 import { Container, Link, Tooltip, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import InfoIcon from '@material-ui/icons/Info';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../AppInsights';
 
 interface P {
     signIn: () => void;
 }
 
-export default class SignIn extends React.Component<P> {
+class SignIn extends React.Component<P> {
 
     public render() {
         return (
@@ -27,3 +29,5 @@ export default class SignIn extends React.Component<P> {
     }
 
 }
+
+export default withAITracking(reactPlugin, SignIn, 'SignIn');

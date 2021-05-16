@@ -1,6 +1,7 @@
 import React from 'react';
 import { GridListTile, GridListTileBar } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+import { useAppInsightsContext, useTrackMetric } from '@microsoft/applicationinsights-react-js';
 import { decodeString, getTimeString } from '../../util';
 import driveClient from '../../DriveClient';
 import { AlbumIndexEntry } from '../../contracts/photos';
@@ -8,6 +9,10 @@ import Image from '../util/Image';
 import ImageList from '../util/ImageList';
 
 export default function Photos() {
+
+    const appInsights = useAppInsightsContext();
+    const trackComponent = useTrackMetric(appInsights, 'Photos');
+    trackComponent();
 
     function renderAlbum(album: AlbumIndexEntry) {
         return (

@@ -3,6 +3,8 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Container, 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CSS from 'csstype';
 import JSZip from 'jszip';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { appInsights, reactPlugin } from '../AppInsights';
 import { Uploader } from '../upload';
 import YourInfo from './YourInfo';
 
@@ -20,7 +22,7 @@ interface S {
     uploadFailed: boolean;
 }
 
-export default class Upload extends React.Component<P, S> {
+class Upload extends React.Component<P, S> {
 
     state: S = {
         uploading: false,
@@ -56,6 +58,7 @@ export default class Upload extends React.Component<P, S> {
                         <DialogActions>
                             <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary">Report</Button>
                             <Button onClick={async () => {
+                                appInsights.trackEvent({ name: 'RetryUpload' });
                                 this.setState({ uploadFailed: false });
                                 const uploadSuccess = await this.uploader!.retryFailedFiles();
                                 if (uploadSuccess) {
@@ -65,6 +68,7 @@ export default class Upload extends React.Component<P, S> {
                                 }
                             }} color="secondary">Retry</Button>
                             <Button onClick={async () => {
+                                appInsights.trackEvent({ name: 'SkipUpload' });
                                 this.setState({ uploadFailed: false });
                                 await this.uploader!.finishUpload();
                                 this.props.onUploadComplete();
@@ -179,6 +183,7 @@ export default class Upload extends React.Component<P, S> {
     }
 
     private async uploadFile(files: File[]) {
+        appInsights.trackEvent({ name: 'StartUpload' });
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zips: JSZip[] = [];
         for (let f of files) {
@@ -194,13 +199,17 @@ export default class Upload extends React.Component<P, S> {
         this.setState({ zips });
         const uploadSuccessful = await this.uploader.upload();
         if (uploadSuccessful) {
+            appInsights.trackEvent({ name: 'UploadSuccessful' });
             this.props.onUploadComplete();
         } else {
+            appInsights.trackEvent({ name: 'UploadFailed', properties: { numFailures: this.uploader!.failedUploads.length, failureReason: this.uploader!.failedUploads[0]?.failureReason.toString() }})
             this.setState({ uploadFailed: true });
         }
     }
 
 }
+
+export default withAITracking(reactPlugin, Upload, 'Upload');
 
 const baseDropZoneStyle: CSS.Properties = {
     border: 'dotted',

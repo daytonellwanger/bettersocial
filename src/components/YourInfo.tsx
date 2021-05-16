@@ -3,6 +3,7 @@ import { Tooltip, Typography } from '@material-ui/core';
 import InfoIcon from '@material-ui/icons/Info';
 import JSZip from 'jszip';
 import Ticker from 'react-ticker'
+import { useAppInsightsContext, useTrackMetric } from '@microsoft/applicationinsights-react-js';
 import { decodeString, getTimeString } from '../util';
 
 interface P {
@@ -17,6 +18,10 @@ type LocationAndTime = {
 type LocationsMap = { [location: string]: LocationAndTime[] };
 
 export default function YourInfo(props: P) {
+
+    const appInsights = useAppInsightsContext();
+    const trackComponent = useTrackMetric(appInsights, 'YourInfo');
+    trackComponent();
 
     const [contactList, setContactList] = useState<string[]>([]);
     const [offFacebookActivity, setOffFacebookActivity] = useState<string[]>([]);

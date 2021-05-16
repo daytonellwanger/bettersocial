@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, GridListTile, GridListTileBar, Link, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import { useAppInsightsContext, useTrackMetric } from '@microsoft/applicationinsights-react-js';
 import driveClient, { getPhotoData } from '../../DriveClient';
 import { decodeString, getTimeString } from '../../util';
 import { Album as AlbumData, Photo as PhotoData } from '../../contracts/photos';
@@ -17,6 +18,10 @@ interface P {
 }
 
 export default function Album(props: P) {
+
+    const appInsights = useAppInsightsContext();
+    const trackComponent = useTrackMetric(appInsights, 'Album');
+    trackComponent();
 
     const [folderLink, setFolderLink] = useState<string | undefined>(undefined);
 
