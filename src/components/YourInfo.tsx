@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Tooltip, Typography } from '@material-ui/core';
 import InfoIcon from '@material-ui/icons/Info';
-import JSZip from 'jszip';
 import Ticker from 'react-ticker'
 import { useAppInsightsContext, useTrackMetric } from '@microsoft/applicationinsights-react-js';
 import { decodeString, getTimeString } from '../util';
 
+const zip = (window as any).zip;
+
 interface P {
-    zips: JSZip[];
+    zips: any[];
 }
 
 type LocationAndTime = {
@@ -30,9 +31,10 @@ export default function YourInfo(props: P) {
     const [searches, setSearches] = useState<string[]>([]);
 
     async function getFileContent(fileName: string): Promise<any> {
-        let file: JSZip.JSZipObject | undefined = undefined;
+        let file: any | undefined = undefined;
         for (let zip of props.zips) {
-            file = zip.files[fileName];
+            const entries = await zip.getEntries();
+            file = entries.filter((f: any) => f.filename === fileName)[0];
             if (file) {
                 break;
             }
@@ -40,7 +42,7 @@ export default function YourInfo(props: P) {
         if (!file) {
             return undefined;
         }
-        const stringContent = await file.async('string');
+        const stringContent = await file.getData(new zip.TextWriter());
         return JSON.parse(stringContent);
     }
 

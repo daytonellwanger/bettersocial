@@ -2,11 +2,12 @@ import React from 'react';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, Link, Typography } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CSS from 'csstype';
-import JSZip from 'jszip';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { appInsights, reactPlugin } from '../AppInsights';
 import { Uploader } from '../upload';
 import YourInfo from './YourInfo';
+
+const zip = (window as any).zip;
 
 interface P {
     onUploadComplete: () => void;
@@ -17,7 +18,7 @@ interface S {
     progress: number;
     message: string;
     itemOverDropZone: boolean;
-    zips?: JSZip[];
+    zips?: any[];
     invalidInput: boolean;
     uploadFailed: boolean;
 }
@@ -185,13 +186,12 @@ class Upload extends React.Component<P, S> {
     private async uploadFile(files: File[]) {
         appInsights.trackEvent({ name: 'StartUpload' });
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
-        const zips: JSZip[] = [];
+        const zips: any[] = [];
         for (let f of files) {
-            const zip = await JSZip.loadAsync(f);
-            zips.push(zip);
+            zips.push(new zip.ZipReader(new zip.BlobReader(f))); 
         }
         this.uploader = new Uploader(zips, (progress, message) => this.setState({ progress, message }));
-        const validInput = this.uploader.preUpload();
+        const validInput = await this.uploader.preUpload();
         if (!validInput) {
             this.setState({ uploading: false, progress: 0, message: '', invalidInput: true });
             return;

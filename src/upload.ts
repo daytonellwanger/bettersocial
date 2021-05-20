@@ -1,14 +1,15 @@
-import JSZip from 'jszip';
 import { Album, AlbumIndex } from './contracts/photos';
 import { Conversation, ConversationIndex } from './contracts/messages';
 import { requestQueue } from './requests';
 import { mainFolderName } from './DriveClient';
 
+const zip = (window as any).zip;
+
 type FileData = {
     file: {
         id?: string,
         name: string,
-        zip: JSZip.JSZipObject
+        zip: any
     },
     parentId: string
 };
@@ -49,7 +50,7 @@ async function uploadFile(name: string, folderId: string, content: string | Blob
 }
 
 export async function unzipAndUploadFile(data: FileData, callback?: () => void): Promise<FileUploadFailure[] | undefined> {
-    const content = await data.file.zip.async('blob');
+    const content = await data.file.zip.getData(new zip.BlobWriter());
     try {
         const result = await uploadFile(data.file.name, data.parentId, content);
         data.file.id = result.response.id;
@@ -69,7 +70,7 @@ export class Uploader {
     private fileUploadListener: () => void;
     public failedUploads: FileUploadFailure[] = [];
 
-    public constructor(private zips: JSZip[], private uploadListener: (progress: number, message: string) => void) {
+    public constructor(private zips: any[], private uploadListener: (progress: number, message: string) => void) {
         this.fileUploadListener = () => {
             this.uploadedFiles++;
             const progress = (this.uploadedFiles / this.totalFiles) * .95;
@@ -78,20 +79,21 @@ export class Uploader {
         this.rootFolder = new Folder(mainFolderName, ['posts', 'comments', 'messages', 'photos_and_videos'], this.fileUploadListener);
     }
 
-    public preUpload(): boolean {
+    public async preUpload(): Promise<boolean> {
         const requiredFiles = ['posts/your_posts_1.json', 'comments/comments.json', 'photos_and_videos/album/0.json'];
         let hadRequiredFile = false;
-        this.zips.forEach((zip) => {
-            zip.forEach((relativePath, file) => {
-                if (file.dir) {
-                    return;
+        for (let zip of this.zips) {
+            const entries = await zip.getEntries();
+            for (let entry of entries) {
+                if (entry.directory) {
+                    continue;
                 }
-                if (requiredFiles.indexOf(relativePath) >= 0) {
+                if (requiredFiles.indexOf(entry.filename) >= 0) {
                     hadRequiredFile = true;
                 }
-                this.rootFolder!.addFile(relativePath, file, false);
-            });
-        });
+                this.rootFolder!.addFile(entry.filename, entry, false);
+            }
+        }
         return hadRequiredFile;
     }
 
@@ -141,7 +143,7 @@ async function createAlbumIndex(root: Folder) {
     }
 
     for (let albumFile of albums) {
-        const content = await albumFile.zip.async('string');
+        const content = await albumFile.zip.getData(new zip.TextWriter());
         const album: Album = JSON.parse(content);
         albumIndex.albums.push({
             id: albumFile.id!,
@@ -172,7 +174,7 @@ async function createConversationIndex(root: Folder) {
             // complain
             continue;
         }
-        const content = await conversationFile.zip.async('string');
+        const content = await conversationFile.zip.getData(new zip.TextWriter());
         const conversation: Conversation = JSON.parse(content);
         conversationIndex.conversations.push({ folderId: conversationFolder.id!, title: conversation!.title });
     }
@@ -183,7 +185,7 @@ async function createConversationIndex(root: Folder) {
 class Folder {
 
     public readonly folders: Folder[];
-    public readonly files: { id?: string, name: string, zip: JSZip.JSZipObject }[] = [];
+    public readonly files: { id?: string, name: string, zip: any }[] = [];
     public id: string | undefined;
 
     public constructor(public readonly name: string, folders: string[] = [], private uploadListener?: () => void) {
@@ -198,7 +200,7 @@ class Folder {
         return numFiles;
     }
 
-    public addFile(relativePath: string, file: JSZip.JSZipObject, createTopFolder = true) {
+    public addFile(relativePath: string, file: any, createTopFolder = true) {
         const pathPieces = relativePath.split('/');
         if (pathPieces.length === 1) {
             this.files.push({ name: pathPieces[0], zip: file });
