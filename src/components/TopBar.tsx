@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { AppBar, Button, IconButton, makeStyles, Menu, MenuItem, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Button, IconButton, makeStyles, Menu, MenuItem, Toolbar, Typography, Link as MaterialLink } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Link } from 'react-router-dom';
 import { useAppInsightsContext, useTrackEvent } from '@microsoft/applicationinsights-react-js';
@@ -23,7 +23,7 @@ export default function TopBar(props: P) {
     return (
         <AppBar position="fixed" ref={appBarRef}>
             <Toolbar>
-                <Typography variant="h6" className={classes.title}>Social Freedom</Typography>
+                <Typography variant="h6" className={classes.title}><MaterialLink href="https://socialfreedom.life/mydata" target="_blank" color="secondary" underline="none">Social Freedom</MaterialLink></Typography>
                 {props.homeEnabled ? <Button color="secondary" component={Link} to="/">Home</Button> : undefined}
                 <IconButton onClick={() => setIsMenuOpen(true)}>
                     <ArrowDropDownIcon color="secondary" />
