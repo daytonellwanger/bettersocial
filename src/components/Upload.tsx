@@ -94,7 +94,7 @@ class Upload extends React.Component<P, S> {
                             event.preventDefault();
                             this.setState({ ...this.state, itemOverDropZone: false })
                         }}>
-                        <Typography color="textSecondary" variant="caption">Drag and drop here</Typography>
+                        <Typography color="textSecondary" variant="caption">Drag and drop .zip here</Typography>
                     </div>
                     <Typography color="secondary" variant="caption">or select with the file picker</Typography>
                     <div style={{ height: '.5em' }} />
