@@ -20,6 +20,7 @@ interface S {
     itemOverDropZone: boolean;
     zips?: any[];
     invalidInput: boolean;
+    browserNotSupported: boolean;
     uploadFailed: boolean;
 }
 
@@ -31,6 +32,7 @@ class Upload extends React.Component<P, S> {
         message: '',
         itemOverDropZone: false,
         invalidInput: false,
+        browserNotSupported: false,
         uploadFailed: false
     };
 
@@ -145,7 +147,16 @@ class Upload extends React.Component<P, S> {
                             <DialogContentText>Looks like you didn't upload valid Facebook data. Make sure you've selected the .zip file you got from <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link>, and make sure you set <Box fontWeight="500" display='inline'>Format</Box> to <Box fontWeight="500" display='inline'>JSON</Box> when requesting your data. See "How to get your data from Facebook" below.</DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary" onClick={() => this.setState({ invalidInput: false })}>Report an issue</Button>
+                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary">Report an issue</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={this.state.browserNotSupported} onClose={() => this.setState({ browserNotSupported: false })}>
+                        <DialogTitle>Browser not supported</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>Looks like you're trying to upload a large file. Safari can't currently handle this. Try on Chrome, Firefox, Edge, or Opera.</DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary">Report an issue</Button>
                         </DialogActions>
                     </Dialog>
                 </Container>
@@ -188,10 +199,16 @@ class Upload extends React.Component<P, S> {
         this.setState({ uploading: true, progress: 0, message: 'Unzipping' });
         const zips: any[] = [];
         for (let f of files) {
-            zips.push(new zip.ZipReader(new zip.BlobReader(f))); 
+            zips.push(new zip.ZipReader(new zip.BlobReader(f)));
         }
         this.uploader = new Uploader(zips, (progress, message) => this.setState({ progress, message }));
-        const validInput = await this.uploader.preUpload();
+        let validInput = true;
+        try {
+            validInput = await this.uploader.preUpload();
+        } catch (e) {
+            this.setState({ uploading: false, progress: 0, message: '', browserNotSupported: true });
+            return;
+        }
         if (!validInput) {
             this.setState({ uploading: false, progress: 0, message: '', invalidInput: true });
             return;
