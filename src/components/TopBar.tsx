@@ -6,7 +6,7 @@ import { useAppInsightsContext, useTrackEvent } from '@microsoft/applicationinsi
 
 interface P {
     homeEnabled: boolean;
-    signOut: () => void;
+    signOut?: () => void;
 }
 
 export default function TopBar(props: P) {
@@ -40,7 +40,11 @@ export default function TopBar(props: P) {
                     <MenuItem onClick={() => { trackFund({}); window.open('https://www.buymeacoffee.com/socialfreedom', '_blank'); setIsMenuOpen(false); }}>Fund</MenuItem>
                     <MenuItem onClick={() => { trackFeedback({}); window.open('https://www.socialfreedom.life/feedback', '_blank'); setIsMenuOpen(false); }}>Feedback</MenuItem>
                     <MenuItem onClick={() => { trackContact({}); window.open('https://www.socialfreedom.life/contact', '_blank'); setIsMenuOpen(false); }}>Contact</MenuItem>
-                    <MenuItem onClick={() => { props.signOut(); setIsMenuOpen(false); }}>Logout</MenuItem>
+                    {
+                        props.signOut
+                            ? <MenuItem onClick={() => { (props.signOut!)(); setIsMenuOpen(false); }}>Logout</MenuItem>
+                            : undefined
+                    }
                 </Menu>
             </Toolbar>
         </AppBar>

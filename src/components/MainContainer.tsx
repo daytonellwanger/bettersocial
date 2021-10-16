@@ -5,7 +5,7 @@ import TopBar from './TopBar';
 interface P {
     children: React.ReactNode;
     homeEnabled: boolean;
-    signOut: () => void;
+    signOut?: () => void;
 }
 
 export default function MainContainer(props: P) {
