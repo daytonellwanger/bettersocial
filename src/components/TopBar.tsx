@@ -23,7 +23,7 @@ export default function TopBar(props: P) {
     return (
         <AppBar position="fixed" ref={appBarRef}>
             <Toolbar>
-                <Typography variant="h6" className={classes.title}><MaterialLink href="https://socialfreedom.life/mydata" target="_blank" color="secondary" underline="none">Social Freedom</MaterialLink></Typography>
+                <Typography variant="h6" className={classes.title}><MaterialLink href="https://socialfreedom.life/mydata" target="_blank" color="secondary" underline="none">Better Social</MaterialLink></Typography>
                 {props.homeEnabled ? <Button color="secondary" component={Link} to="/">Home</Button> : undefined}
                 <IconButton onClick={() => setIsMenuOpen(true)}>
                     <ArrowDropDownIcon color="secondary" />

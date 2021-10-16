@@ -15,7 +15,7 @@ class SignIn extends React.Component<P> {
         return (
             <Container style={{ height: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }} maxWidth="md">
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <Typography variant="h2">Welcome to Social Freedom</Typography>
+                    <Typography variant="h2">Welcome to Better Social</Typography>
                     <Button variant="contained" color="primary" onClick={this.props.signIn} style={{ marginTop: '1.5em', marginBottom: '1.5em' }}>Sign In</Button>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <Link href="https://www.socialfreedom.life/mydata#why-google" target="_blank" color="secondary" underline="always">Why Google sign in?</Link>
