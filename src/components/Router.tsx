@@ -49,7 +49,7 @@ export default class Router extends React.Component<P, S> {
             if (this.state.hasData) {
                 return (
                     <BrowserRouter>
-                        <MainContainer homeEnabled={true} signOut={this.props.signOut}>
+                        <MainContainer homeEnabled={true} signOut={this.props.signOut} betterSocialLink="/about" openBetterSocialLinkInNewTab={true}>
                             <Route exact path="/" render={() => <Home />} />
                             <Route exact path="/posts" render={() => <Page { ...posts } />} />
                             <Route exact path="/photos" render={() => <Photos />} />
@@ -62,7 +62,7 @@ export default class Router extends React.Component<P, S> {
                 );
             } else {
                 return (
-                    <MainContainer homeEnabled={false} signOut={this.props.signOut}>
+                    <MainContainer homeEnabled={false} signOut={this.props.signOut} betterSocialLink="/about" openBetterSocialLinkInNewTab={true}>
                         <div style={{ height: '100%', overflowY: 'scroll' }}>
                             <Upload onUploadComplete={() => this.initDriveClient()} />
                         </div>

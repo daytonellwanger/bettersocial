@@ -5,6 +5,8 @@ import TopBar from './TopBar';
 interface P {
     children: React.ReactNode;
     homeEnabled: boolean;
+    betterSocialLink: string;
+    openBetterSocialLinkInNewTab: boolean;
     signOut?: () => void;
 }
 
@@ -14,7 +16,7 @@ export default function MainContainer(props: P) {
 
     return (
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <TopBar signOut={props.signOut} homeEnabled={props.homeEnabled} />
+            <TopBar signOut={props.signOut} homeEnabled={props.homeEnabled} betterSocialLink={props.betterSocialLink} openBetterSocialLinkInNewTab={props.openBetterSocialLinkInNewTab} />
             <div className={classes.toolbar} />
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 {props.children}

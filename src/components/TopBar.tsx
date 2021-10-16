@@ -6,6 +6,8 @@ import { useAppInsightsContext, useTrackEvent } from '@microsoft/applicationinsi
 
 interface P {
     homeEnabled: boolean;
+    betterSocialLink: string;
+    openBetterSocialLinkInNewTab: boolean;
     signOut?: () => void;
 }
 
@@ -23,7 +25,7 @@ export default function TopBar(props: P) {
     return (
         <AppBar position="fixed" ref={appBarRef}>
             <Toolbar>
-                <Typography variant="h6" className={classes.title}><MaterialLink href="https://socialfreedom.life/mydata" target="_blank" color="secondary" underline="none">Better Social</MaterialLink></Typography>
+                <Typography variant="h6" className={classes.title}><MaterialLink href={props.betterSocialLink} target={props.openBetterSocialLinkInNewTab ? "_blank" : undefined} color="secondary" underline="none">Better Social</MaterialLink></Typography>
                 {props.homeEnabled ? <Button color="secondary" component={Link} to="/">Home</Button> : undefined}
                 <IconButton onClick={() => setIsMenuOpen(true)}>
                     <ArrowDropDownIcon color="secondary" />

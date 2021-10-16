@@ -21,7 +21,7 @@ class SignIn extends React.Component<P> {
                         <Button variant="contained" color="primary" onClick={() => window.open('/about', '_self')} style={{ marginTop: '1.5em', marginBottom: '1.5em' }}>About</Button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <Link href="https://www.socialfreedom.life/mydata#why-google" target="_blank" color="secondary" underline="always">Why Google sign in?</Link>
+                        <Link href="/about#why-google" target="_blank" color="secondary" underline="always">Why Google sign in?</Link>
                         <Tooltip title="Google is a popular platform with free cloud storage that has a respectable privacy policy. Click the link to learn more.">
                             <InfoIcon color="secondary" fontSize="small" style={{ marginLeft: '.2em' }}/>
                         </Tooltip>

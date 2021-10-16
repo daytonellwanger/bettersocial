@@ -6,7 +6,7 @@ export default class About extends React.Component {
 
     render() {
         return (
-            <MainContainer homeEnabled={true}>
+            <MainContainer homeEnabled={true} betterSocialLink="/" openBetterSocialLinkInNewTab={false}>
                 <div style={{ height: '100%', overflowY: 'scroll' }}>
                     <Container maxWidth="lg" style={{ padding: '2em' }}>
                         <Typography variant="h4" color="secondary">Own Your Facebook Data</Typography>
@@ -46,7 +46,7 @@ export default class About extends React.Component {
                         <br />
                         <Typography variant="body1" color="secondary">Again, we have no servers — the site is simply requesting information from your Google Drive and displaying it in your browser. We just provide the glue that makes it happen.</Typography>
                         <br />
-                        <Typography variant="h5" color="secondary">Why Google?</Typography>
+                        <Typography variant="h5" color="secondary" id="why-google">Why Google?</Typography>
                         <br />
                         <Typography variant="body1" color="secondary">Taking your data from one controversy-ridden tech behemoth whose business model is essentially using your data to sell ads and uploading it to another may seem like it doesn’t buy you much. However, while Google is mainly funded through ad revenue, Google Drive is mainly funded through selling you more storage. No one would use a cloud storage provider that snooped through their content. <Link color="secondary" href="https://www.google.com/drive/terms-of-service/" underline="always" target="_blank">Google Drive's Terms of Service</Link> state that "your content remains yours." In addition, according to <Link color="secondary" href="https://policies.google.com/privacy" underline="always" target="_blank">Google's Privacy Policy</Link>, your data is not shared with anyone else except your domain administrator, in the case that you have an organizational account, or in the case of legal matters.</Typography>
                         <br />
