@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Link, Typography } from '@material-ui/core';
 import { appInsights } from '../AppInsights';
-import Main from './Main';
+import MainRouter from './MainRouter';
 
 interface S {
     error?: any;
@@ -30,7 +30,7 @@ export default class ErrorHandler extends React.Component<{}, S> {
                 </Container>
             );
         } else {
-            return <Main />
+            return <MainRouter />
         }
     }
 
