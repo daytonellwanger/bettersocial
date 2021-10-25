@@ -39,7 +39,7 @@ export default function TopBar(props: P) {
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
-                    <MenuItem onClick={() => { trackFund({}); window.open('https://www.buymeacoffee.com/socialfreedom', '_blank'); setIsMenuOpen(false); }}>Fund</MenuItem>
+                    <MenuItem onClick={() => { trackFund({}); window.open('https://www.buymeacoffee.com/bettersocial', '_blank'); setIsMenuOpen(false); }}>Fund</MenuItem>
                     <MenuItem onClick={() => { trackFeedback({}); window.open('https://www.socialfreedom.life/feedback', '_blank'); setIsMenuOpen(false); }}>Feedback</MenuItem>
                     <MenuItem onClick={() => { trackContact({}); window.open('https://www.socialfreedom.life/contact', '_blank'); setIsMenuOpen(false); }}>Contact</MenuItem>
                     {

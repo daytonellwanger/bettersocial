@@ -38,7 +38,7 @@ export default class About extends React.Component {
                         <br />
                         <Typography variant="body1" color="secondary">Facebook has no incentive to make the experience of viewing your data enjoyable or easy. In fact, they’re disincentivized from doing so. We believe we can provide you with a better experience.</Typography>
                         <br />
-                        <Typography variant="h5" color="secondary">How it works</Typography>
+                        <Typography variant="h5" color="secondary" id="how-it-works">How it works</Typography>
                         <br />
                         <Typography variant="body1" color="secondary">You log in with your Google account (more on that below) and upload your data that you got from Facebook. Your data is stored in your Google Drive — you can find it in the “facebook-data” folder. It never goes anywhere else. We don’t actually have any servers of our own, so it can’t.</Typography>
                         <br />
@@ -54,7 +54,7 @@ export default class About extends React.Component {
                         <br />
                         <Typography variant="h5" color="secondary">How we’re funded</Typography>
                         <br />
-                        <Typography variant="body1" color="secondary">We’re funded through donations, not your data. You can donate <Link color="secondary" href="https://www.buymeacoffee.com/socialfreedom" underline="always" target="_blank">here</Link>.</Typography>
+                        <Typography variant="body1" color="secondary">We’re funded through donations, not your data. You can donate <Link color="secondary" href="https://www.buymeacoffee.com/bettersocial" underline="always" target="_blank">here</Link>.</Typography>
                         <br />
                     </Container>
                 </div>
