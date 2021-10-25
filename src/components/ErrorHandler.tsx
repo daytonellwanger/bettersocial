@@ -22,7 +22,7 @@ export default class ErrorHandler extends React.Component<{}, S> {
             return (
                 <Container style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
                     <div>
-                        <Typography variant="h4" color="secondary" style={{ marginBottom: '1em' }}>Whoops! Something went wrong. <Link href="https://www.socialfreedom.life/feedback" target="_blank" underline="always">Report an issue</Link>.</Typography>
+                        <Typography variant="h4" color="secondary" style={{ marginBottom: '1em' }}>Whoops! Something went wrong. <Link href="https://bettersocial.life/feedback" target="_blank" underline="always">Report an issue</Link>.</Typography>
                         <Typography variant="caption" color="secondary" style={{ marginBottom: '.5em' }}>Details:</Typography>
                         <Typography variant="h4" color="secondary">{this.state.error.toString()}</Typography>
                         <Typography variant="caption" color="secondary">{this.state.error.stack}</Typography>

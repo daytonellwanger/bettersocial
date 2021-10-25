@@ -3,6 +3,7 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 import { BrowserRouter, Route } from 'react-router-dom';
 import Main from './Main';
 import About from './About';
+import Contact from './Contact';
 
 export default function MainRouter() {
 
@@ -11,6 +12,8 @@ export default function MainRouter() {
             <BrowserRouter>
                 <Route exact path="/" render={() => <Main />} />
                 <Route exact path="/about" render={() => <About />} />
+                <Route exact path="/contact" render={() => <Contact />} />
+                <Route exact path="/feedback" render={() => <Contact />} />
             </BrowserRouter>
         );
     }

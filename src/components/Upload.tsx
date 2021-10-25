@@ -59,7 +59,7 @@ class Upload extends React.Component<P, S> {
                             ))}
                         </DialogContent>
                         <DialogActions>
-                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary">Report</Button>
+                            <Button component={Link} href="https://bettersocial.life/feedback" target="_blank" color="secondary">Report</Button>
                             <Button onClick={async () => {
                                 appInsights.trackEvent({ name: 'RetryUpload' });
                                 this.setState({ uploadFailed: false });
@@ -147,7 +147,7 @@ class Upload extends React.Component<P, S> {
                             <DialogContentText>Looks like you didn't upload valid Facebook data. Make sure you've selected the .zip file you got from <Link href="https://facebook.com/dyi/" target="_blank" color="secondary">facebook.com/dyi</Link>, and make sure you set <Box fontWeight="500" display='inline'>Format</Box> to <Box fontWeight="500" display='inline'>JSON</Box> when requesting your data. See "How to get your data from Facebook" below.</DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary">Report an issue</Button>
+                            <Button component={Link} href="https://bettersocial.life/feedback" target="_blank" color="secondary">Report an issue</Button>
                         </DialogActions>
                     </Dialog>
                     <Dialog open={this.state.browserNotSupported} onClose={() => this.setState({ browserNotSupported: false })}>
@@ -156,7 +156,7 @@ class Upload extends React.Component<P, S> {
                             <DialogContentText>Looks like you're trying to upload a large file. Safari can't currently handle this. Try on Chrome, Firefox, Edge, or Opera.</DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button component={Link} href="https://www.socialfreedom.life/feedback" target="_blank" color="secondary">Report an issue</Button>
+                            <Button component={Link} href="https://bettersocial.life/feedback" target="_blank" color="secondary">Report an issue</Button>
                         </DialogActions>
                     </Dialog>
                 </Container>
