@@ -1,4 +1,4 @@
-# Off Facebook
+# Better Social
 
 ## Run
 `yarn install`
