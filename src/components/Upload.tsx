@@ -83,7 +83,7 @@ class Upload extends React.Component<P, S> {
         } else {
             return (
                 <Container style={{ padding: '2em' }} maxWidth="sm">
-                    <Typography color="secondary" variant="body1">Welcome to Social Freedom! To get started, upload your data.</Typography>
+                    <Typography color="secondary" variant="body1">Welcome to Better Social! To get started, upload your data.</Typography>
                     <div style={this.state.itemOverDropZone ? activeDropZoneStyle : inactiveDropZoneStyle}
                         onDrop={(event) => this.handleDropFile(event)}
                         onDragOver={(event) => {
