@@ -1,5 +1,7 @@
 # Better Social
 
+[https://BetterSocial.life](https://bettersocial.life)
+
 ## Run
 `yarn install`
 
